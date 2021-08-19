@@ -1,0 +1,33 @@
+-cp src
+-cp example
+
+-lib tink_core
+-lib tink_url
+-lib atom
+-lib capsule
+-lib blok.core.foundation
+
+-D js-es=6
+
+--each
+
+-lib toml
+-lib markdown
+-lib hxnodejs
+-lib blok.platform.static
+
+-D blok.gen.ssr
+
+-main Build
+
+-js dist/build.js
+
+--next
+
+-lib blok.platform.dom
+
+-D blok.gen.client
+
+-main Client
+
+-js dist/www/assets/app.js

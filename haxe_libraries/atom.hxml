@@ -1,0 +1,3 @@
+# @install: lix --silent download "gh://github.com/wartman/atom#b482a1f098caa57fa394c7b1186721e608129c2f" into atom/0.0.0/github/b482a1f098caa57fa394c7b1186721e608129c2f
+-cp ${HAXE_LIBCACHE}/atom/0.0.0/github/b482a1f098caa57fa394c7b1186721e608129c2f/src
+-D atom=0.0.0
