@@ -45,12 +45,14 @@ class Visitor implements Service {
   }
 
   function generate(url) {
+    visited.push(url);
     return generator
       .generate(url)
       .next(html -> {
         var name = url == '' ? 'index' : url;
         trace('Visiting: ${name}');
         writer.write(generatePath(url), html);
+        Noise;
       });
   }
 

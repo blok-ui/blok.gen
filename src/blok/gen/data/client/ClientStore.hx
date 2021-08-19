@@ -12,12 +12,15 @@ class ClientStore implements Store {
     this.apiRoot = apiRoot;
   }
 
-  public function find<T:Model>(query:Query<T>):Promise<Array<T>> {
+  public function find<T:Model>(query:Query<T>):Promise<StoreResult<T>> {
     var url = Path.join([ apiRoot, query.asJsonName() ]);
     return window
       .fetch(url, { credentials: INCLUDE })
       .toPromise()
       .next(res -> res.json())
-      .next((data:Array<Dynamic>) -> data.map(query.meta.create));
+      .next((result:StoreResult<Dynamic>) -> {
+        meta: result.meta,
+        data: result.data.map(query.meta.create)
+      });
   }
 }

@@ -14,7 +14,7 @@ abstract class Page<T> implements Route<VNode> {
   public function new(store) {
     this.store = store;
   }
-
+  
   abstract public function match(url:String):Option<RouteAction<VNode>>;
   
   abstract public function render(meta:MetadataService, data:T):VNode;

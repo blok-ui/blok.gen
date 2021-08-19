@@ -4,6 +4,7 @@ using StringTools;
 
 @service(fallback = new MetadataService(new Config({
   siteTitle: 'Unnamed',
+  siteUrl: '',
   apiRoot: 'api'
 })))
 class MetadataService implements Service {
@@ -14,7 +15,8 @@ class MetadataService implements Service {
   public function new(config) {
     this.config = config;
     site = new SiteMetadata({
-      title: config.siteTitle
+      title: config.siteTitle,
+      url: config.siteUrl
     });
   }
 

@@ -16,7 +16,7 @@ class SsrStore implements Store {
   final reader:Reader;
   final writer:Writer;
   final formatters:FormatterCollection;
-  final cache:HashMap<Query<Dynamic>, Array<Dynamic>> = new HashMap();
+  final cache:HashMap<Query<Dynamic>, StoreResult<Dynamic>> = new HashMap();
 
   public function new(reader, writer, formatters) {
     this.reader = reader;
@@ -24,22 +24,25 @@ class SsrStore implements Store {
     this.formatters = formatters;
   }
   
-  public function find<T:Model>(query:Query<T>):Promise<Array<T>> {
+  public function find<T:Model>(query:Query<T>):Promise<StoreResult<T>> {
     if (cache.exists(query)) return Promise.resolve(cast cache.get(query));
     return (switch query.id {
       case null:
         findMany(query);
       case id:
         findOne(id, query);
-    }).next(data -> {
-      saveJson(query, data);
-      var models = data.map(query.meta.create);
+    }).next(result -> {
+      saveJson(query, result);
+      var models:StoreResult<T> = {
+        meta: result.meta,
+        data: result.data.map(query.meta.create)
+      };
       cache.set(query, models);
       return models;
     });
   }
 
-  function findOne<T:Model>(id:String, query:Query<T>):Promise<Array<Dynamic>> {
+  function findOne<T:Model>(id:String, query:Query<T>):Promise<StoreResult<Dynamic>> {
     return baseFind(query.meta)
       .next(results -> Promise.inParallel(results.map(res -> format(query, res))))
       .next(results -> {
@@ -51,22 +54,60 @@ class SsrStore implements Store {
           var index = results.indexOf(file);
           var prev = results[index - 1];
           var next = results[index + 1];
-          return [ prev, file, next ];
+          var data = [ prev, file, next ];
+          var real = data.filter(d -> d != null);
+          return {
+            meta: {
+              startIndex: results.indexOf(real[0]),
+              endIndex: results.indexOf(real[real.length - 1]),
+              total: results.length,
+              count: real.length
+            },
+            data: data
+          };
         } else {
-          [ file ];
+          return {
+            meta: {
+              startIndex: results.indexOf(file),
+              endIndex: results.indexOf(file),
+              total: results.length,
+              count: 1
+            },
+            data: [ file ]
+          };
         });
       });
   }
 
-  function findMany<T:Model>(query:Query<T>):Promise<Array<Dynamic>> {
+  function findMany<T:Model>(query:Query<T>):Promise<StoreResult<Dynamic>> {
     return baseFind(query.meta)
       .next(files -> {
         if (files.length < query.first) {
           return new Error(404, 'The requested start index is out of range');
         }
-        return files.slice(query.first, query.first + query.count + 1);
+        var data = files.slice(query.first, query.first + query.count);
+        if (data.length <= 0) {
+          trace(query.first + ' ' + query.count);
+          return new Error(404, 'No data found');
+        }
+        return {
+          meta: {
+            startIndex: files.indexOf(data[0]),
+            endIndex: files.indexOf(data[data.length - 1]),
+            count: data.length,
+            total: files.length
+          },
+          data: data
+        };
       })
-      .next(results -> Promise.inParallel(results.map(res -> format(query, res))));
+      .next(result -> {
+        Promise
+          .inParallel(result.data.map(res -> format(query, res)))
+          .next(data -> {
+            meta: result.meta,
+            data: data
+          });
+      });
   }
 
   function baseFind<T:Model>(meta:ModelMetadata<T>) {
@@ -84,7 +125,7 @@ class SsrStore implements Store {
       });
   }
 
-  function saveJson<T:Model>(query:Query<T>, json:Array<Dynamic>) {
+  function saveJson<T:Model>(query:Query<T>, json:StoreResult<Dynamic>) {
     writer.write(query.asJsonName(), Json.stringify(json));
   }
 

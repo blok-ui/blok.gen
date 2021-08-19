@@ -4,6 +4,7 @@ using haxe.io.Path;
 
 class Config implements Record {
   @prop var siteTitle:String;
+  @prop var siteUrl:String;
 
   /**
     The name of the cilent app.

@@ -1,5 +1,4 @@
 ---
-id = "yams"
 title = "Yams!"
 ---
 
