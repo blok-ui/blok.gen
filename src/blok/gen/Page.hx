@@ -14,12 +14,12 @@ abstract class Page<T> implements Route<VNode> {
   public function new(store) {
     this.store = store;
   }
-  
+
   abstract public function match(url:String):Option<RouteAction<VNode>>;
   
   abstract public function render(meta:MetadataService, data:T):VNode;
 
-  function loading():VNodeResult {
+  function renderLoading():VNodeResult {
     return AppService.use(app -> app.loadingPage());
   }
 
@@ -27,11 +27,9 @@ abstract class Page<T> implements Route<VNode> {
     return Suspend.await(
       () -> {
         var data = suspendable.get();
-        return Context.use(context -> {
-          render(MetadataService.from(context), data);
-        });
+        return MetadataService.use(meta -> render(meta, data));
       },
-      loading
+      renderLoading
     );
   }
 }
