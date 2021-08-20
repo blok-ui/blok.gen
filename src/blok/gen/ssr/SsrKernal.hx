@@ -2,6 +2,7 @@ package blok.gen.ssr;
 
 import haxe.io.Path;
 import blok.gen.data.Store;
+import blok.gen.data.StoreService;
 import blok.gen.data.ssr.SsrStore;
 import blok.gen.storage.Reader;
 import blok.core.foundation.routing.history.StaticHistory;
@@ -13,12 +14,12 @@ class SsrKernal implements Kernal {
   final formatters:FormatterCollection;
   final routesFactory:(store:Store)->Array<Route<VNode>>;
 
-  public function new(appRoot, config, reader, formatters, routesFactory) {
+  public function new(appRoot, config, routesFactory, reader, formatters) {
     this.appRoot = appRoot;
     this.config = config;
+    this.routesFactory = routesFactory;
     this.reader = reader;
     this.formatters = formatters;
-    this.routesFactory = routesFactory;
   }
 
   public function run() {
@@ -30,6 +31,7 @@ class SsrKernal implements Kernal {
     var visitor = new Visitor(
       config,
       url -> AppRoot.node({
+        store: new StoreService(store),
         pages: new PageRouter({
           routes: routesFactory(store),
           history: new StaticHistory(url)

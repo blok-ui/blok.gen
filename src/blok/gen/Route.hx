@@ -2,6 +2,10 @@ package blok.gen;
 
 using tink.CoreApi;
 
-interface Route<T> {
-  public function match(url:String):Option<RouteAction<T>>;
+class Route<T> {
+  public final match:(url:String)->Option<T>;
+  
+  public function new(match) {
+    this.match = match;
+  }
 }

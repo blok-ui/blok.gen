@@ -13,11 +13,11 @@ function main() {
   var kernal = new SsrKernal(
     Path.join([ root, 'dist', 'www' ]),
     config,
+    factory,
     new FileReader(Path.join([ root, 'example', 'data' ])),
     new FormatterCollection([
       'md' => new MarkdownFormatter(new TomlFormatter())
-    ]),
-    factory
+    ])
   );
   kernal.run();
 }

@@ -3,6 +3,7 @@ package blok.gen.client;
 import js.Browser;
 import blok.dom.Platform;
 import blok.gen.data.Store;
+import blok.gen.data.StoreService;
 import blok.gen.data.client.ClientStore;
 import blok.core.foundation.routing.history.BrowserHistory;
 
@@ -25,6 +26,7 @@ class ClientKernal implements Kernal {
         .factory()
         .provide(meta)
         .render(context -> AppRoot.node({
+          store: new StoreService(store),
           pages: new PageRouter({
             routes: routesFactory(store),
             history: new BrowserHistory()

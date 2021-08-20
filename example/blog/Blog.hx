@@ -15,8 +15,7 @@ final config = new Config({
 });
 
 function factory(store:Store):Array<Route<VNode>> return [
-  new Home(store),
-  new Post(store),
-  new PostArchive(store)
+  Home.route(),
+  Post.route(),
+  PostArchive.route()
 ];
-

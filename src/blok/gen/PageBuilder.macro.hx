@@ -9,6 +9,7 @@ using blok.gen.tools.PathTools;
 class PageBuilder {
   public static function build() {
     var builder = ClassBuilder.fromContext();
+    var clsTp = builder.getTypePath();
     var loader = builder.getField('load');
     var params:Array<Expr> = [];
     var url = builder.cls.name.nameToPath();
@@ -40,27 +41,24 @@ class PageBuilder {
         default:
           Context.error('`load` must be a function', loader.pos);
       }
-  
-      if (builder.getField('match') != null) {
-        Context.error(
-          '`match` is automatically generated -- '
-          + 'do not define it yourself', 
-          builder.getField('match').pos
-        );
-      }
       
       var pattern = url == '/'
         ? macro [] | [ '' ]
         : macro [ $a{route} ];
   
       return macro class {
-        public function match(url:String):haxe.ds.Option<blok.gen.RouteAction<blok.VNode>> {
-          var normalized = haxe.io.Path.normalize(url);
-          if (StringTools.startsWith(normalized, '/')) normalized = normalized.substr(1);
-          return switch normalized.split('/') {
-            case ${pattern}: Some(() -> wrap(load($a{params})));
-            default: None;
-          }
+        public static function route():blok.gen.Route<blok.VNode> {
+          return new blok.gen.Route(url -> {
+            return switch blok.gen.PageTools.prepareUrl(url).split('/') {
+              case ${pattern}: 
+                Some(blok.gen.data.StoreService.use(service -> {
+                  var page = new $clsTp(service.getStore());
+                  return blok.gen.PageTools.wrapPage(page, page.load($a{params}));
+                }));
+              default: 
+                None;
+            }
+          });
         }
       };
     });

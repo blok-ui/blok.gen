@@ -8,7 +8,7 @@ using tink.CoreApi;
 class PageRouter implements State {
   @prop var history:History;
   @prop var routes:RouteCollection<VNode>;
-  @prop var route:Option<RouteAction<VNode>> = None;
+  @prop var route:Option<VNode> = None;
 
   @init
   function setup() {

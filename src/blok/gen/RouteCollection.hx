@@ -7,9 +7,9 @@ abstract RouteCollection<T>(Array<Route<T>>) from Array<Route<T>> {
     this = pages;
   }
 
-  public function match(url:String):Option<RouteAction<T>> {
+  public function match(url:String):Option<T> {
     for (route in this) switch route.match(url) {
-      case Some(action): return Some(action);
+      case Some(result): return Some(result);
       case None:
     }
     return None;
