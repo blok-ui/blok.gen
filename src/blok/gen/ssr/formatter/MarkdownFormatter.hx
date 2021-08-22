@@ -1,5 +1,6 @@
 package blok.gen.ssr.formatter;
 
+import blok.gen.storage.FileResult;
 using Markdown;
 using StringTools;
 using tink.CoreApi;
@@ -18,7 +19,8 @@ class MarkdownFormatter<T> implements Formatter<MarkdownResult<T>> {
     this.formatter = if (formatter == null) new TomlFormatter() else formatter;
   }
 
-  public function parse(data:String):Promise<MarkdownResult<T>> {
+  public function parse(file:FileResult):Promise<MarkdownResult<T>> {
+    var data = file.content;
     if (data.startsWith(sep)) {
       var raw = data.substr(sep.length);
       var index = raw.indexOf(sep);
@@ -29,7 +31,10 @@ class MarkdownFormatter<T> implements Formatter<MarkdownResult<T>> {
       else
         content;
       
-      return formatter.parse(matter).next(data -> {
+      return formatter.parse({
+        meta: file.meta,
+        content: matter
+      }).next(data -> {
         data: data,
         excerpt: excerpt.markdownToHtml(),
         content: content.markdownToHtml()

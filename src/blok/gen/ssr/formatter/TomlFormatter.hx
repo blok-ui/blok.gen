@@ -1,5 +1,6 @@
 package blok.gen.ssr.formatter;
 
+import blok.gen.storage.FileResult;
 import toml.TomlError;
 
 using tink.CoreApi;
@@ -7,10 +8,10 @@ using tink.CoreApi;
 class TomlFormatter<T> implements Formatter<T> {
   public function new() {}
 
-  public function parse(contents:String):Promise<T> {
+  public function parse(file:FileResult):Promise<T> {
     return new Promise((res, rej) -> {
       try {
-        res(Toml.parse(contents));
+        res(Toml.parse(file.content));
       } catch (e:TomlError) {
         rej(new Error(500, e.toString()));
       } catch (e) {

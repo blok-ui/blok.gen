@@ -12,6 +12,7 @@
 --each
 
 -lib toml
+-lib boxup.compiler
 -lib markdown
 -lib hxnodejs
 -lib blok.platform.static
@@ -22,12 +23,12 @@
 
 -js dist/build.js
 
---next
+# --next
 
--lib blok.platform.dom
+# -lib blok.platform.dom
 
--D blok.gen.client
+# -D blok.gen.client
 
--main Client
+# -main Client
 
--js dist/www/assets/app.js
+# -js dist/www/assets/app.js

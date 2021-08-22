@@ -133,7 +133,7 @@ class SsrStore implements Store {
     var formatter = formatters.find(result.meta.extension);
     if (formatter == null) return new Error(404, 'No formatter found');
     return formatter
-      .parse(result.content)
+      .parse(result)
       .next(data -> try {
         query.meta.parse(result, data);
       } catch (e) {
