@@ -2,9 +2,14 @@ package blok.gen;
 
 using haxe.io.Path;
 
+enum AssetType {
+  AssetCss(path:String);
+}
+
 class Config implements Record {
   @prop var siteTitle:String;
   @prop var siteUrl:String;
+  @prop var globalAssets:Array<AssetType> = [];
 
   /**
     The name of the cilent app.
@@ -25,7 +30,6 @@ class Config implements Record {
     Where to find assets (such as scripts and styles)
   **/
   @prop var assetPath:String = '/assets';
-
   
   public function getClientAppPath() {
     return Path

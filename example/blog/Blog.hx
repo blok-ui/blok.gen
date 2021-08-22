@@ -14,7 +14,7 @@ final config = new Config({
   apiRoot: '/api/v1'
 });
 
-function factory(store:Store):Array<Route<VNode>> return [
+final routes:Array<Route<VNode>> = [
   Home.route(),
   Post.route(),
   PostArchive.route()

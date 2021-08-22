@@ -1,20 +1,22 @@
 import blok.gen.ssr.formatter.TomlFormatter;
 import blok.gen.ssr.formatter.MarkdownFormatter;
 import blok.gen.ssr.FormatterCollection;
-import blok.gen.ssr.FileReader;
 import blok.gen.ssr.SsrKernal;
+import blok.gen.ssr.SsrConfig;
 import blog.Blog.config;
-import blog.Blog.factory;
+import blog.Blog.routes;
 
 using haxe.io.Path;
 
 function main() {
   var root = Sys.programPath().directory().directory();
   var kernal = new SsrKernal(
-    Path.join([ root, 'dist', 'www' ]),
+    new SsrConfig({
+      source: Path.join([ root, 'example', 'data' ]),
+      destination: Path.join([ root, 'dist', 'www' ])
+    }),
     config,
-    factory,
-    new FileReader(Path.join([ root, 'example', 'data' ])),
+    routes,
     new FormatterCollection([
       'md' => new MarkdownFormatter(new TomlFormatter())
     ])

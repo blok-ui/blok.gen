@@ -8,24 +8,22 @@ import blok.gen.storage.Reader;
 import blok.core.foundation.routing.history.StaticHistory;
 
 class SsrKernal implements Kernal {
-  final appRoot:String;
-  final reader:Reader;
+  final ssrConfig:SsrConfig;
   final config:Config;
   final formatters:FormatterCollection;
-  final routesFactory:(store:Store)->Array<Route<VNode>>;
+  final routes:Array<Route<VNode>>;
 
-  public function new(appRoot, config, routesFactory, reader, formatters) {
-    this.appRoot = appRoot;
+  public function new(ssrConfig, config, routes, formatters) {
+    this.ssrConfig = ssrConfig;
     this.config = config;
-    this.routesFactory = routesFactory;
-    this.reader = reader;
+    this.routes = routes;
     this.formatters = formatters;
   }
 
   public function run() {
     var store = new SsrStore(
-      reader,
-      new FileWriter(Path.join([ appRoot, config.apiRoot])),
+      new FileReader(ssrConfig.source),
+      new FileWriter(Path.join([ ssrConfig.destination, config.apiRoot ])),
       formatters
     );
     var visitor = new Visitor(
@@ -33,7 +31,7 @@ class SsrKernal implements Kernal {
       url -> AppRoot.node({
         store: new StoreService(store),
         pages: new PageRouter({
-          routes: routesFactory(store),
+          routes: routes,
           history: new StaticHistory(url)
         }),
         // @todo: I really hate how this works -- it's a bad idea
@@ -43,7 +41,7 @@ class SsrKernal implements Kernal {
           () -> Html.text('loading')
         )
       }),
-      new FileWriter(appRoot)
+      new FileWriter(ssrConfig.destination)
     );
 
     visitor.start();

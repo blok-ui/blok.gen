@@ -9,11 +9,11 @@ import blok.core.foundation.routing.history.BrowserHistory;
 
 class ClientKernal implements Kernal {
   final config:Config;
-  final routesFactory:(store:Store)->Array<Route<VNode>>;
+  final routes:Array<Route<VNode>>;
 
-  public function new(config, routesFactory) {
+  public function new(config, routes) {
     this.config = config;
-    this.routesFactory = routesFactory;
+    this.routes = routes;
   }
   
   public function run():Void {
@@ -28,7 +28,7 @@ class ClientKernal implements Kernal {
         .render(context -> AppRoot.node({
           store: new StoreService(store),
           pages: new PageRouter({
-            routes: routesFactory(store),
+            routes: routes,
             history: new BrowserHistory()
           }),
           // @todo: I really hate how this works -- it's a bad idea

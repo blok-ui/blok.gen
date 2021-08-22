@@ -44,11 +44,18 @@ class HtmlGenerator {
   }
   
   function wrap(meta:MetadataService, body:String) {
+    var css = config.globalAssets
+      .filter(c -> c.match(AssetCss(_)))
+      .map(c -> switch c {
+        case AssetCss(path): Path.join([ config.assetPath, path ]);
+        default: null;
+      });
     return '
 <!doctype html>
 <html>
   <head>
     <title>${meta.getSite().title} | ${meta.getPage().title}</title>
+    ${ [ for (path in css) '<link href="$path" rel="stylesheet" />' ].join('\n') }
   </head>
   <body>
     <div id="${config.rootId}">${body}</div>
