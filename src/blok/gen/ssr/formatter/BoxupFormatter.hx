@@ -14,7 +14,7 @@ using haxe.io.Path;
 using tink.CoreApi;
 using boxup.schema.SchemaTools;
 
-class BoxFormatter<T> implements Formatter<T> {
+class BoxupFormatter<T> implements Formatter<T> {
   final config:BoxupFormatterConfig<T>;
   final reader:Reader;
   final schemaCollection:SchemaCollection = new SchemaCollection();
