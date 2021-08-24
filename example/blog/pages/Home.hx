@@ -15,7 +15,9 @@ class Home extends Page<StoreResult<BlogPost>> {
   public function load():Promise<StoreResult<BlogPost>> {
     return BlogPost
       .fromStore(store)
-      .find({ count: 10, first: 0 });
+      .all()
+      .sortBy(SortCreated)
+      .fetch();
   }
 
   public function render(meta:MetadataService, posts:StoreResult<BlogPost>) {
@@ -27,10 +29,7 @@ class Home extends Page<StoreResult<BlogPost>> {
       }),
       Html.ul({}, ...[ for (post in posts.data) 
         Html.li({},
-          PageLink.node({
-            url: '/post/${post.id}',
-            child: Html.text(post.title)
-          })
+          Post.link(post.id, Html.text(post.title))
         )  
       ])
     );

@@ -14,7 +14,9 @@ class Post extends Page<StoreResult<BlogPost>> {
   public function load(id:String):Promise<StoreResult<BlogPost>> {
     return BlogPost
       .fromStore(store)
-      .find({ id: id, includeSiblings: true });
+      .byId(id)
+      .withSiblings()
+      .fetch();
   }
 
   public function render(meta:MetadataService, posts:StoreResult<BlogPost>) {
@@ -27,14 +29,12 @@ class Post extends Page<StoreResult<BlogPost>> {
     return Html.div({},
       Html.h1({}, Html.text(post.title)),
       Html.div({}, post.content),
-      if (previous != null) PageLink.node({
-        url: '/post/${previous.id}',
-        child: Html.text('<-' + previous.title)
-      }) else null,
-      if (next != null) PageLink.node({
-        url: '/post/${next.id}',
-        child: Html.text(next.title + ' ->')
-      }) else null
+      if (previous != null) 
+        Post.link(previous.id, Html.text('<-' + previous.title)) 
+      else null,
+      if (next != null) 
+        Post.link(next.id, Html.text(next.title + ' ->')) 
+      else null
     );
   }
 }

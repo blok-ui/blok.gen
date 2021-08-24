@@ -12,8 +12,8 @@ class ClientStore implements Store {
     this.apiRoot = apiRoot;
   }
 
-  public function find<T:Model>(query:Query<T>):Promise<StoreResult<T>> {
-    var url = Path.join([ apiRoot, query.asJsonName() ]);
+  public function find<T:Model>(query:QueryBuilder<T>):Promise<StoreResult<T>> {
+    var url = Path.join([ apiRoot, query.getJsonName() ]);
     return window
       .fetch(url, { credentials: INCLUDE })
       .toPromise()

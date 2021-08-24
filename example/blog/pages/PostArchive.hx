@@ -2,7 +2,6 @@ package blog.pages;
 
 import blok.gen.MetadataService;
 import blok.gen.Page;
-import blok.gen.PageLink;
 import blok.gen.data.StoreResult;
 import blog.data.BlogPost;
 
@@ -13,12 +12,13 @@ using blok.gen.tools.PaginationTools;
 class PostArchive extends Page<StoreResult<BlogPost>> {
   static final perPage:Int = 2;
 
-  public function load(pageNum:String) {
-    var page = Std.parseInt(pageNum);
+  public function load(page:Int) {
     var first = page.toIndex(perPage);
     return BlogPost
       .fromStore(store)
-      .find({ first: first, count: perPage });
+      .range(first, perPage)
+      .sortBy(SortCreated)
+      .fetch();
   }
 
   public function render(meta:MetadataService, posts:StoreResult<BlogPost>) {
@@ -31,17 +31,11 @@ class PostArchive extends Page<StoreResult<BlogPost>> {
     return Html.div({},
       Html.ul({}, ...[ for (post in posts.data) 
         Html.li({},
-          PageLink.node({
-            url: '/post/${post.id}',
-            child: Html.text(post.title)
-          })
+          Post.link(post.id, Html.text(post.title))
         )
       ]),
       if (nextPage <= totalPages)
-        PageLink.node({
-          url: '/post-archive/${nextPage}',
-          child: Html.text('Next Page ->')
-        })
+        PostArchive.link(nextPage, Html.text('Next Page ->'))
       else null
     );
   }

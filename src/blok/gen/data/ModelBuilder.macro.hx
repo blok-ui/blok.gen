@@ -23,9 +23,6 @@ class ModelBuilder {
       var name = options.name == null
         ? builder.cls.name.nameToPath()
         : options.name;
-      var sort = options.sortBy == null
-        ? macro blok.gen.data.ModelMetadata.ModelSort.SortName
-        : options.sortBy;
       var ext = options.extension == null
         ? 'md'
         : options.extension;
@@ -34,7 +31,6 @@ class ModelBuilder {
         : options.idProperty;
       return macro ({
         name: $v{name},
-        sortBy: ${sort},
         extension: $v{ext},
         idProperty: $v{id},
         create: (props) -> if (props != null) new $clsTp(props) else null,
@@ -90,9 +86,9 @@ class ModelBuilder {
 
       return macro class {
         static final __meta:blok.gen.data.ModelMetadata<$clsType> = ${meta};
-
+        
         public static function fromStore(store:blok.gen.data.Store) {
-          return new blok.gen.data.ModelStore(__meta, store);
+          return new blok.gen.data.QueryBuilder(__meta, store);
         }
       }
     });

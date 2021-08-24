@@ -33,11 +33,22 @@ class PageBuilder {
       if (loader == null) {
         Context.error('Requires a `load` method', builder.cls.pos);
       }
+
+      var args:Array<FunctionArg> = [];
   
       switch loader.kind {
         case FFun(f):
-          params = [ for (arg in f.args) macro $i{arg.name} ];
-          route = route.concat(params);
+          args = f.args;
+          params = [ for (arg in f.args) switch arg.type {
+            case (macro:String): 
+              macro $i{arg.name};
+            case (macro:Int):
+              macro Std.parseInt($i{arg.name});
+            default:
+              Context.error('Invalid param type', loader.pos);
+              null; 
+          }];
+          route = route.concat([ for (arg in f.args) macro $i{arg.name} ]);
         default:
           Context.error('`load` must be a function', loader.pos);
       }
@@ -45,6 +56,26 @@ class PageBuilder {
       var pattern = url == '/'
         ? macro [] | [ '' ]
         : macro [ $a{route} ];
+
+      var linkParams = [ macro $v{url} ].concat([ for (arg in args) switch arg.type {
+        case (macro:String): macro $i{arg.name};
+        default: macro Std.string($i{arg.name});
+      } ]);
+
+      builder.addFields([
+        {
+          name: 'link',
+          access: [ APublic, AStatic ],
+          kind: FFun({
+            args: args.concat([ { name: 'child', type: macro:blok.VNode } ]),
+            expr: macro return blok.gen.PageLink.node({
+              url: haxe.io.Path.join([ $a{linkParams} ]),
+              child: child
+            })
+          }),
+          pos: (macro null).pos
+        }
+      ]);
   
       return macro class {
         public static function route():blok.gen.Route<blok.VNode> {
@@ -52,8 +83,8 @@ class PageBuilder {
             return switch blok.gen.PageTools.prepareUrl(url).split('/') {
               case ${pattern}: 
                 Some(blok.gen.data.StoreService.use(service -> {
-                  var page = new $clsTp(service.getStore());
-                  return blok.gen.PageTools.wrapPage(page, page.load($a{params}));
+                  var __blokGenPage = new $clsTp(service.getStore());
+                  return blok.gen.PageTools.wrapPage(__blokGenPage, __blokGenPage.load($a{params}));
                 }));
               default: 
                 None;
