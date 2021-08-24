@@ -11,11 +11,10 @@ using haxe.io.Path;
 function main() {
   var root = Sys.programPath().directory().directory();
   var kernal = new SsrKernal(
-    new SsrConfig({
+    config.withSsr(new SsrConfig({
       source: Path.join([ root, 'example', 'data' ]),
       destination: Path.join([ root, 'dist', 'www' ])
-    }),
-    config,
+    })),
     routes,
     new FormatterCollection([
       'md' => new MarkdownFormatter(new TomlFormatter())

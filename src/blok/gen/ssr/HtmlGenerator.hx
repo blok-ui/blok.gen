@@ -17,15 +17,20 @@ class HtmlGenerator {
     this.build = build;
   }
 
-  public function generate(url:String):Promise<String> {
+  public function generate(url:String):Promise<{
+    data: Dynamic,
+    html: String
+  }> {
     return new Promise((res, rej) -> {
       var tracker = new SuspendTracker();
       var meta = new MetadataService(config);
+      var ssrService = new SsrService();
       var root = Platform.render(
         Provider
           .factory()
           .provide(tracker)
           .provide(meta)
+          .provide(ssrService)
           .render(context -> build(url)), 
         text -> null,
         e -> rej(new Error(500, e.toString())) 
@@ -34,7 +39,7 @@ class HtmlGenerator {
       tracker.status.observe(status -> switch status {
         case Ready | Waiting(0):
           trace('Ready: ${url}');
-          res(wrap(meta, root.toConcrete().join('')));
+          res(wrap(meta, ssrService, root.toConcrete().join('')));
         case Waiting(num):
           trace('Waiting: ${num}');
       });
@@ -43,14 +48,16 @@ class HtmlGenerator {
     });
   }
   
-  function wrap(meta:MetadataService, body:String) {
+  function wrap(meta:MetadataService, ssr:SsrService, body:String) {
     var css = config.globalAssets
       .filter(c -> c.match(AssetCss(_)))
       .map(c -> switch c {
         case AssetCss(path): Path.join([ config.assetPath, path ]);
         default: null;
       });
-    return '
+    return {
+      data: ssr.getData(),
+      html:'
 <!doctype html>
 <html>
   <head>
@@ -62,6 +69,7 @@ class HtmlGenerator {
     <script src="${config.getClientAppPath()}"></script>
   </body>
 </html>
-    '.trim();
+    '.trim()
+    };
   }
 }

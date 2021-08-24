@@ -1,14 +1,14 @@
 package blok.gen.ssr;
 
+import haxe.Json;
 import haxe.io.Path;
-import blok.gen.storage.Writer;
 
 using tink.CoreApi;
 
 @service(fallback = null)
 class Visitor implements Service {
   final generator:HtmlGenerator;
-  final writer:Writer;
+  final writer:FileWriter;
   final visited:Array<String> = [];
   var pending:Array<String> = [];
 
@@ -48,16 +48,22 @@ class Visitor implements Service {
     visited.push(url);
     return generator
       .generate(url)
-      .next(html -> {
+      .next(res -> {
         var name = url == '' ? 'index' : url;
         trace('Visiting: ${name}');
-        writer.write(generatePath(url), html);
+        writer.write(generateHtmlPath(url), res.html);
+        writer.write(generateJsonPath(url), Json.stringify(res.data));
         Noise;
       });
   }
 
-  function generatePath(url:String) {
+  function generateHtmlPath(url:String) {
     if (url.length == 0) return 'index.html';
     return Path.join([ url, 'index.html' ]);
+  }
+
+  function generateJsonPath(url:String) {
+    if (url.length == 0) return 'data.json';
+    return Path.join([ url, 'data.json' ]);
   }
 }

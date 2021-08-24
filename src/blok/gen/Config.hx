@@ -30,6 +30,13 @@ class Config implements Record {
     Where to find assets (such as scripts and styles)
   **/
   @prop var assetPath:String = '/assets';
+
+  #if blok.gen.ssr
+    @prop var ssr:blok.gen.ssr.SsrConfig = new blok.gen.ssr.SsrConfig({
+      source: 'data',
+      destination: 'www'
+    });
+  #end
   
   public function getClientAppPath() {
     return Path

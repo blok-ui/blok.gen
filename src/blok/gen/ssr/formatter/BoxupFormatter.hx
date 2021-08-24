@@ -7,8 +7,8 @@ import boxup.schema.SchemaCompiler;
 import boxup.Parser;
 import boxup.Scanner;
 import boxup.schema.SchemaCollection;
-import blok.gen.storage.Reader;
-import blok.gen.storage.FileResult;
+import blok.gen.datasource.FileDataSource;
+import blok.gen.datasource.FileResult;
 
 using haxe.io.Path;
 using tink.CoreApi;
@@ -16,7 +16,7 @@ using boxup.schema.SchemaTools;
 
 class BoxupFormatter<T> implements Formatter<T> {
   final config:BoxupFormatterConfig<T>;
-  final reader:Reader;
+  final reader:FileDataSource;
   final schemaCollection:SchemaCollection = new SchemaCollection();
 
   public function new(config, reader) {

@@ -7,11 +7,11 @@ using StringTools;
 using haxe.io.Path;
 
 class PageTools {
-  public static function wrapPage<T>(page:Page<T>, suspendable:SuspendablePromise<T>) {
+  public static function wrapPage<T>(page:Page<T>, suspendable:SuspendablePromise<Dynamic>) {
     return Suspend.await(
       () -> {
         var data = suspendable.get();
-        return MetadataService.use(meta -> page.render(meta, data));
+        return MetadataService.use(meta -> page.render(meta, page.decode(data)));
       },
       page.renderLoading
     );

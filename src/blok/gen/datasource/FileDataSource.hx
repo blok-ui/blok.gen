@@ -1,15 +1,13 @@
-package blok.gen.ssr;
+package blok.gen.datasource;
 
 import sys.io.File;
 import sys.FileSystem;
-import blok.gen.storage.FileResult;
-import blok.gen.storage.Reader;
 
 using Lambda;
 using haxe.io.Path;
 using tink.CoreApi;
 
-class FileReader implements Reader {
+class FileDataSource {
   final root:String;
 
   public function new(root) {

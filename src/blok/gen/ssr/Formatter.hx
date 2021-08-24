@@ -1,6 +1,6 @@
 package blok.gen.ssr;
 
-import blok.gen.storage.FileResult;
+import blok.gen.datasource.FileResult;
 
 using tink.CoreApi;
 

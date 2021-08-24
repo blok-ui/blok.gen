@@ -1,7 +1,6 @@
 package blog;
 
 import blok.VNode;
-import blok.gen.data.Store;
 import blok.gen.Config;
 import blok.gen.Route;
 import blog.pages.*;

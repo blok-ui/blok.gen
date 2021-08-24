@@ -32,5 +32,9 @@ class MetadataService implements Service {
     page = page.withTitle(title.htmlEscape());
   }
 
+  public function setPageData(data:Dynamic) {
+    page = page.withData(data);
+  }
+
   // etc
 }

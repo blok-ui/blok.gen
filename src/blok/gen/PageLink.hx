@@ -23,7 +23,7 @@ class PageLink extends Component {
       href: Path.join([ meta.getSite().url, url  ]),
       onclick: e -> {
         e.preventDefault();
-        router.setUrl(url);
+        router.setUrl(Path.join([ meta.getSite().url, url ]));
       }
     }, child);
   }

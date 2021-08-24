@@ -2,26 +2,38 @@ package blog.pages;
 
 import blok.gen.MetadataService;
 import blok.gen.Page;
-import blok.gen.data.StoreResult;
 import blog.data.BlogPost;
 
 using Blok;
+using Reflect;
+using tink.CoreApi;
 using blok.gen.tools.PaginationTools;
 
+typedef PostsWithMeta = {
+  meta:{
+    total:Int,
+    startIndex:Int
+  },
+  data:Array<BlogPost>
+};
+
 @page(route = 'post-archive')
-class PostArchive extends Page<StoreResult<BlogPost>> {
+class PostArchive extends Page<PostsWithMeta> {
   static final perPage:Int = 2;
 
   public function load(page:Int) {
-    var first = page.toIndex(perPage);
-    return BlogPost
-      .fromStore(store)
-      .range(first, perPage)
-      .sortBy(SortCreated)
-      .fetch();
+    return blog.datasource.BlogPostDataSource
+      .findPosts(config.ssr, page.toIndex(perPage), perPage);
   }
 
-  public function render(meta:MetadataService, posts:StoreResult<BlogPost>) {
+  public function decode(data:Dynamic):PostsWithMeta {
+    return {
+      meta: data.field('meta'),
+      data: (data.field('data'):Array<Dynamic>).map(BlogPost.new)
+    };
+  }
+
+  public function render(meta:MetadataService, posts:PostsWithMeta) {
     var totalPages = posts.meta.total.paginate(perPage);
     var currentPage = posts.meta.startIndex.toPageNumber(perPage);
     var nextPage = currentPage + 1;

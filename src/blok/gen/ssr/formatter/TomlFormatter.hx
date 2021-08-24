@@ -1,6 +1,6 @@
 package blok.gen.ssr.formatter;
 
-import blok.gen.storage.FileResult;
+import blok.gen.datasource.FileResult;
 import toml.TomlError;
 
 using tink.CoreApi;

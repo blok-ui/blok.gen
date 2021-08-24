@@ -1,4 +1,4 @@
-package blok.gen.storage;
+package blok.gen.datasource;
 
 typedef FileResult = {
   meta:{

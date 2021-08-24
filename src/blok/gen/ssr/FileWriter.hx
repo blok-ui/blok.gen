@@ -1,13 +1,11 @@
 package blok.gen.ssr;
 
-import blok.gen.storage.Writer;
-
 using sys.io.File;
 using sys.FileSystem;
 using haxe.io.Path;
 using tink.CoreApi;
 
-class FileWriter implements Writer {
+class FileWriter {
   final root:String;
 
   public function new(root) {

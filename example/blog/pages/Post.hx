@@ -4,36 +4,42 @@ import blok.gen.PageLink;
 import blok.Html;
 import blok.gen.Page;
 import blok.gen.MetadataService;
-import blok.gen.data.StoreResult;
 import blog.data.BlogPost;
 
 using Reflect;
 using tink.CoreApi;
 
-class Post extends Page<StoreResult<BlogPost>> {
-  public function load(id:String):Promise<StoreResult<BlogPost>> {
-    return BlogPost
-      .fromStore(store)
-      .byId(id)
-      .withSiblings()
-      .fetch();
+typedef PostWithSiblings = {
+  public final prev:Null<BlogPost>;
+  public final next:Null<BlogPost>;
+  public final current:BlogPost;
+}
+
+class Post extends Page<PostWithSiblings> {
+  public function load(id:String) {
+    return blog.datasource.BlogPostDataSource.getPost(config.ssr, id);
   }
 
-  public function render(meta:MetadataService, posts:StoreResult<BlogPost>) {
-    var post = posts.data[1];
-    var previous = posts.data[0];
-    var next = posts.data[2];
+  public function decode(data:Dynamic):PostWithSiblings {
+    var meta:{ next:Dynamic, prev:Dynamic } = data.field('meta');
+    return {
+      next: if (meta.next != null) new BlogPost(meta.next) else null,
+      prev: if (meta.prev != null) new BlogPost(meta.prev) else null,
+      current: new BlogPost(data.field('data'))
+    };
+  }
 
-    meta.setPageTitle('Post | ${post.title}');
+  public function render(meta:MetadataService, posts:PostWithSiblings) {
+    meta.setPageTitle('Post | ${posts.current.title}');
     
     return Html.div({},
-      Html.h1({}, Html.text(post.title)),
-      Html.div({}, post.content),
-      if (previous != null) 
-        Post.link(previous.id, Html.text('<-' + previous.title)) 
+      Html.h1({}, Html.text(posts.current.title)),
+      Html.div({}, posts.current.content),
+      if (posts.prev != null) 
+        Post.link(posts.prev.id, Html.text('<-' + posts.prev.title)) 
       else null,
-      if (next != null) 
-        Post.link(next.id, Html.text(next.title + ' ->')) 
+      if (posts.next != null) 
+        Post.link(posts.next.id, Html.text(posts.next.title + ' ->')) 
       else null
     );
   }
