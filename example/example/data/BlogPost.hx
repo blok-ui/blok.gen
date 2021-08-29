@@ -1,4 +1,4 @@
-package blog.data;
+package example.data;
 
 import blok.Record;
 import blok.gen.data.Id;
@@ -12,3 +12,4 @@ class BlogPost implements Record {
   @prop var title:String;
   @prop var content:Content;
 }
+

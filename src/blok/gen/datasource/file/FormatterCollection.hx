@@ -1,4 +1,4 @@
-package blok.gen.ssr;
+package blok.gen.datasource.file;
 
 abstract FormatterCollection(Map<String, Formatter<Dynamic>>) {
   public function new(formatters) {

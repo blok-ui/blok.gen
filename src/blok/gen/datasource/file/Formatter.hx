@@ -1,4 +1,4 @@
-package blok.gen.ssr;
+package blok.gen.datasource.file;
 
 import blok.gen.datasource.FileResult;
 

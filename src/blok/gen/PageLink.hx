@@ -6,7 +6,7 @@ class PageLink extends Component {
   @prop var url:String;
   @prop var child:VNode;
   @use var router:PageRouter;
-  @use var meta:MetadataService;
+  @use var config:ConfigService;
   #if blok.gen.ssr
     @use var visitor:blok.gen.ssr.Visitor;
   #end
@@ -20,10 +20,10 @@ class PageLink extends Component {
 
   function render() {
     return Html.a({
-      href: Path.join([ meta.getSite().url, url  ]),
+      href: Path.join([ config.getConfig().site.url, url  ]),
       onclick: e -> {
         e.preventDefault();
-        router.setUrl(Path.join([ meta.getSite().url, url ]));
+        router.setUrl(Path.join([ config.getConfig().site.url, url ]));
       }
     }, child);
   }

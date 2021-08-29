@@ -1,6 +1,5 @@
-package blok.gen.ssr.formatter;
+package blok.gen.datasource.file;
 
-import blok.gen.datasource.FileResult;
 using Markdown;
 using StringTools;
 using tink.CoreApi;

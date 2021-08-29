@@ -3,7 +3,6 @@
 
 -lib tink_core
 -lib tink_url
--lib atom
 -lib capsule
 -lib blok.core.foundation
 
@@ -11,15 +10,14 @@
 
 --each
 
--lib toml
--lib boxup.compiler
--lib markdown
 -lib hxnodejs
+-lib toml
+-lib markdown
 -lib blok.platform.static
 
 -D blok.gen.ssr
 
--main Build
+-main Ssr
 
 -js dist/build.js
 

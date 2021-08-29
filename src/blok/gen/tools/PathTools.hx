@@ -1,5 +1,8 @@
 package blok.gen.tools;
 
+using StringTools;
+using haxe.io.Path;
+
 class PathTools {
   public static function nameToPath(name:String) {
     var path = '';
@@ -12,5 +15,11 @@ class PathTools {
 
   static inline function isUc(c:String) {
     return c > 'A' && c < 'Z';
+  }
+
+  public static inline function prepareUrl(url:String) {
+    var normalized = url.normalize();
+    if (normalized.startsWith('/')) normalized = normalized.substr(1);
+    return normalized;
   }
 }

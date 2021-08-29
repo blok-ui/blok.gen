@@ -1,11 +1,10 @@
-package blog.pages;
+package example.page;
 
-import blok.gen.PageLink;
-import blok.Html;
+import blok.gen.AsyncData;
 import blok.gen.Page;
-import blok.gen.MetadataService;
-import blog.data.BlogPost;
+import example.data.BlogPost;
 
+using Blok;
 using Reflect;
 using tink.CoreApi;
 
@@ -16,8 +15,10 @@ typedef PostWithSiblings = {
 }
 
 class Post extends Page<PostWithSiblings> {
-  public function load(id:String) {
-    return blog.datasource.BlogPostDataSource.getPost(config.ssr, id);
+  public function load(id:String):AsyncData<Dynamic> {
+    return getContext()
+      .getService(example.datasource.BlogPostDataSource)
+      .getPost(id);
   }
 
   public function decode(data:Dynamic):PostWithSiblings {
@@ -28,10 +29,8 @@ class Post extends Page<PostWithSiblings> {
       current: new BlogPost(data.field('data'))
     };
   }
-
-  public function render(meta:MetadataService, posts:PostWithSiblings) {
-    meta.setPageTitle('Post | ${posts.current.title}');
-    
+  
+  public function render(posts:PostWithSiblings) {
     return Html.div({},
       Html.h1({}, Html.text(posts.current.title)),
       Html.div({}, posts.current.content),

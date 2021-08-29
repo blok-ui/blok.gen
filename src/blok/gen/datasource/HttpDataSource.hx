@@ -6,17 +6,17 @@ using tink.CoreApi;
 using haxe.io.Path;
 
 class HttpDataSource {
-  final apiRoot:String;
+  final root:String;
 
-  public function new(apiRoot) {
-    this.apiRoot = apiRoot;
+  public function new(root) {
+    this.root = root;
   }
 
-  public function fetch(path:String) {
-    var url = Path.join([ apiRoot, path ]);
-    return window
+  public function fetch<T>(path:String):AsyncData<T> {
+    var url = Path.join([ root, path ]);
+    return Loading(window
       .fetch(url, { credentials: INCLUDE })
       .toPromise()
-      .next(res -> res.json());
+      .next(res -> res.json()));
   }
 }

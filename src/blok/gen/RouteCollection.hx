@@ -1,17 +1,24 @@
 package blok.gen;
 
+using StringTools;
 using tink.CoreApi;
+using blok.gen.tools.PathTools;
 
-abstract RouteCollection<T>(Array<Route<T>>) from Array<Route<T>> {
-  public function new(pages) {
-    this = pages;
+class RouteCollection<T> extends Route<T> {
+  final prefix:Null<String>;
+
+  public function new(children:Array<Route<T>>, ?prefix) {
+    super();
+    this.prefix = prefix;
+    for (child in children) addChild(child);
   }
+  
 
-  public function match(url:String):Option<T> {
-    for (route in this) switch route.match(url) {
-      case Some(result): return Some(result);
-      case None:
+  override public function match(url:String):Option<AsyncData<T>> {
+    if (prefix != null) {
+      if (!url.prepareUrl().startsWith(prefix)) return None;
+      url = url.prepareUrl().substr(prefix.length);
     }
-    return None;
+    return super.match(url);
   }
 }

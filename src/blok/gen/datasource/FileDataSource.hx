@@ -9,23 +9,45 @@ using tink.CoreApi;
 
 class FileDataSource {
   final root:String;
+  final cache:Map<String, Dynamic> = [];
 
   public function new(root) {
     this.root = root;
   }
 
-  public function list(path:String, filter:(name:String)->Bool):Promise<Array<FileResult>> {
-    var fullPath = Path.join([ root, path ]);
-    if (!FileSystem.exists(fullPath) || !FileSystem.isDirectory(fullPath)) {
-      return new Error(404, '${fullPath} is not a directory');
+  public function list(path:String, filter:(name:String)->Bool):AsyncData<Array<FileResult>> {
+    if (cache.exists(path)) {
+      return Ready(cache.get(path));
     }
+
+    var fullPath = Path.join([ root, path ]);
+
+    if (!FileSystem.exists(fullPath) || !FileSystem.isDirectory(fullPath)) {
+      return Failed(new Error(404, '${fullPath} is not a directory'));
+    }
+
     var paths = FileSystem.readDirectory(fullPath).filter(filter);
-    return Promise.inParallel([ 
+   
+    return Loading(Promise.inParallel([ 
       for (file in paths) read(Path.join([ path, file ]))
-    ]);
+    ]).next(files -> {
+      cache.set(fullPath, files);
+      files;
+    }));
   }
 
-  public function read(path:String):Promise<FileResult> {
+  public function get(path:String):AsyncData<FileResult> {
+    if (cache.exists(path)) {
+      return Ready(cache.get(path));
+    }
+
+    return Loading(read(path).next(file -> {
+      cache.set(path, file);
+      file;
+    }));
+  }
+
+  function read(path:String):Promise<FileResult> {
     var fullPath = Path.join([ root, path ]);
     var dir = fullPath.directory();
 

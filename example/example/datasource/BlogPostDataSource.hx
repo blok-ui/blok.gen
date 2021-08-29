@@ -1,29 +1,36 @@
-package blog.datasource;
+package example.datasource;
 
-import blok.gen.ssr.formatter.TomlFormatter;
-import blok.gen.ssr.formatter.MarkdownFormatter;
+import blok.gen.AsyncData;
+import blok.Service;
 import blok.gen.data.Id;
 import blok.gen.datasource.FileResult;
 import blok.gen.datasource.FileDataSource;
-import blok.gen.ssr.SsrConfig;
-import blog.data.BlogPost;
+import blok.gen.datasource.file.TomlFormatter;
+import blok.gen.datasource.file.MarkdownFormatter;
+import example.data.BlogPost;
 
 using Reflect;
 using Lambda;
 using haxe.io.Path;
 using tink.CoreApi;
 
-// todo: A lot of this could be pulled into a generic DataSource.
-class BlogPostDataSource {
-  static final formatter = new MarkdownFormatter(new TomlFormatter());
+@service(isOptional)
+class BlogPostDataSource implements Service {
+  final formatter = new MarkdownFormatter(new TomlFormatter());
+  final source:FileDataSource;
 
-  public static function getPost(config:SsrConfig, id:Id<BlogPost>) {
-    return base(config).next(posts -> {
+  public function new(root) {
+    source = new FileDataSource(root);
+  }
+
+  public function getPost(id:Id<BlogPost>) {
+    return base().flatMap(posts -> {
       var post = posts.find(file -> file.meta.name == id);
       var index = posts.indexOf(post);
       var prev = posts[index - 1];
       var next = posts[index + 1];
-      return Promise.inParallel([
+      
+      return Loading(Promise.inParallel([
         prev == null ? Promise.resolve(null) : decode(prev),
         decode(post),
         next == null ? Promise.resolve(null) : decode(next)
@@ -35,20 +42,21 @@ class BlogPostDataSource {
           },
           data: posts[1]
         });
-      });
+      }));
     });
   }
 
-  public static function findPosts(config:SsrConfig, first:Int, count:Int) {
-    return base(config).next(files -> {
+  public function findPosts(first:Int, count:Int) {
+    return base().flatMap(files -> {
       var data = files.slice(first, first + count);
       if (data.length <= 0) {
-        return new Error(404, 'No data found');
+        return Failed(new Error(404, 'No data found'));
       }
+
       var startIndex = files.indexOf(data[0]);
       var endIndex = files.indexOf(data[data.length - 1]);
 
-      return Promise
+      return Loading(Promise
         .inParallel(data.map(decode))
         .next(posts -> Promise.resolve({
           meta: {
@@ -58,21 +66,20 @@ class BlogPostDataSource {
             total: files.length
           },
           data: posts
-        }));
+        })));
     });
   }
 
-  static function base(config:SsrConfig) {
-    var source = new FileDataSource(config.source);
+  function base():AsyncData<Array<FileResult>> {
     return source
       .list('post', path -> path.extension() == 'md')
-      .next(posts -> {
+      .map(posts -> {
         posts.sort((a, b) -> Math.ceil(a.meta.updated.getTime() - b.meta.updated.getTime()));
         posts;
       });
   }
 
-  static function decode(file:FileResult) {
+  function decode(file:FileResult) {
     return formatter
       .parse(file)
       .next(data -> Promise.resolve(new BlogPost({

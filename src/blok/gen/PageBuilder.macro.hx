@@ -5,16 +5,27 @@ import haxe.macro.Context;
 import blok.tools.ClassBuilder;
 
 using blok.gen.tools.PathTools;
+using haxe.macro.Tools;
 
-// @todo: This is a total mess, as we were just trying to make things work.
-//        Refactor!
 class PageBuilder {
   public static function build() {
     var builder = ClassBuilder.fromContext();
     var clsTp = builder.getTypePath();
-    var loader = builder.getField('load');
-    var params:Array<Expr> = [];
     var url = builder.cls.name.nameToPath();
+
+    if (builder.getField('match') != null) {
+      Context.error('`match` cannot be manually generated on pages', builder.getField('match').pos);
+    }
+
+    if (builder.cls.superClass.t.get().module != 'blok.gen.Page') {
+      Context.error('Pages must extends blok.gen.Page', builder.cls.pos);
+    }
+
+    var dataType = builder.cls.superClass.params[0].toComplexType();
+
+    // switch builder.cls.superClass.t.get() {
+      
+    // }
 
     builder.addClassMetaHandler({
       name: 'page',
@@ -31,19 +42,30 @@ class PageBuilder {
       var route:Array<Expr> = url == '/'
         ? [] 
         : url.split('/').map(s -> macro $v{s});
+      var args:Array<FunctionArg> = [];
+      var fromParams:Array<Expr> = [];
+      var toParams:Array<Expr> = [];
       var pattern:Expr = macro [];
-      var linkParams:Array<Expr> = [];
+      var loader = builder.getField('load');
 
       if (loader == null) {
         Context.error('Requires a `load` method', builder.cls.pos);
       }
+      if (!loader.access.contains(APublic)) {
+        Context.error('`load` cannot be private', loader.pos);
+      }
+      if (loader.access.contains(AStatic)) {
+        Context.error('`load` cannot be static', loader.pos);
+      }
 
-      var args:Array<FunctionArg> = [];
-  
       switch loader.kind {
         case FFun(f):
+          if (f.ret == null || !Context.unify(f.ret.toType(), Context.getType('blok.gen.AsyncData'))) {
+            Context.error('`load` must return a blok.gen.AsyncData', loader.pos);
+          }
+
           args = f.args;
-          params = [ for (arg in f.args) switch arg.type {
+          fromParams = [ for (arg in args) switch arg.type {
             case (macro:String): 
               macro $i{arg.name};
             case (macro:Int):
@@ -52,29 +74,36 @@ class PageBuilder {
               Context.error('Invalid param type', loader.pos);
               null; 
           }];
-
-          route = route.concat([ for (arg in f.args) macro $i{arg.name} ]);
-          pattern = url == '/'
-            ? macro [] | [ '' ]
-            : macro [ $a{route} ];
-          linkParams = [ macro $v{url} ].concat([ for (arg in args) switch arg.type {
+          toParams = [ macro $v{url} ].concat([ for (arg in args) switch arg.type {
             case (macro:String): macro $i{arg.name};
             default: macro Std.string($i{arg.name});
           } ]);
+          route = route.concat([ for (arg in args) macro $i{arg.name} ]);
+          pattern = url == '/'
+            ? macro [] | [ '' ]
+            : macro [ $a{route} ];
 
           var expr = f.expr;
           f.expr = macro {
             #if blok.gen.ssr
-              ${expr};
+              return $expr;
             #else
-              var __url = haxe.io.Path.join([ $a{[ macro config.siteUrl ].concat(linkParams)} ]);
-              return new blok.gen.datasource.HttpDataSource(__url).fetch('data.json');
+              return switch findParentOfType(blok.gen.RouteContext) {
+                case Some(context):
+                  var config = context.getService(blok.gen.ConfigService).getConfig();
+                  var source = new blok.gen.datasource.CompiledDataSource(config.site.url);
+                  var path = haxe.io.Path.join([ $a{toParams.concat([ macro 'data.json' ])} ]);
+                  return source.fetch(path);
+                case None: 
+                  Failed(new tink.core.Error(500, 'RouteContext not available'));
+              }
             #end
           }
+
         default:
           Context.error('`load` must be a function', loader.pos);
       }
-
+      
       builder.addFields([
         {
           name: 'link',
@@ -82,37 +111,37 @@ class PageBuilder {
           kind: FFun({
             args: args.concat([ { name: 'child', type: macro:blok.VNode } ]),
             expr: macro return blok.gen.PageLink.node({
-              url: haxe.io.Path.join([ $a{linkParams} ]),
+              url: haxe.io.Path.join([ $a{toParams} ]),
               child: child
             })
           }),
           pos: (macro null).pos
         }
       ]);
-  
+
       return macro class {
-        public static function route():blok.gen.Route<blok.VNode> {
-          return new blok.gen.Route(url -> {
-            return switch blok.gen.PageTools.prepareUrl(url).split('/') {
-              case ${pattern}: 
-                return Some(blok.gen.AppService.use(service -> {
-                    var __blokGenPage = new $clsTp(service.config);
-                    #if blok.gen.ssr
-                      return blok.gen.ssr.SsrService.use(ssr -> {
-                        var __promise = __blokGenPage.load($a{params}).next(data -> {
-                          ssr.setData(data); // meh
-                          data;
-                        });
-                        return blok.gen.PageTools.wrapPage(__blokGenPage, __promise);
-                      });
-                    #else
-                      blok.gen.PageTools.wrapPage(__blokGenPage, __blokGenPage.load($a{params}));
-                    #end
+        override public function match(url:String):haxe.ds.Option<blok.gen.AsyncData<blok.gen.PageResult>> {
+          return switch blok.gen.tools.PathTools.prepareUrl(url).split('/') {
+            case ${pattern}:
+              switch load($a{fromParams}) {
+                case Ready(data):
+                  Some(Ready({
+                    data: data,
+                    view: render(decode(data))
                   }));
-              default: 
-                None;
-            }
-          });
+                case Loading(promise):
+                  Some(Loading(promise.next(data -> {
+                    data: data,
+                    view: render(decode(data))
+                  })));
+                case Failed(error):
+                  Some(Failed(error));
+                case None:
+                  None;
+              }
+            default:
+              super.match(url);
+          }
         }
       };
     });
