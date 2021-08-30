@@ -21,6 +21,10 @@ class SsrKernal extends Kernal {
     var visitor = new Visitor(this);
     var writer = new FileWriter(config.ssrConfig.destination);
 
+    Sys.println('');
+    Sys.println('Starting to build "${config.site.siteTitle}":');
+    Sys.println('');
+
     visitor.visit('/');
     visitor.run().handle(o -> switch o {
       case Success(data): Promise.inParallel(data.map(result -> {
@@ -30,14 +34,17 @@ class SsrKernal extends Kernal {
         ]);
       })).handle(o -> switch o {
         case Success(_):
-          Sys.println('Successfully compiled');
+          Sys.println('');
+          Sys.println('Build completed with no errors.');
           Sys.exit(0);
         case Failure(failure):
-          Sys.println('Failed: ${failure.message}');
+          Sys.println('');
+          Sys.println('Build failed with: ${failure.message}');
           Sys.exit(1);
       });
       case Failure(failure):
-        Sys.println('Failed: ${failure.message}');
+        Sys.println('');
+        Sys.println('Build failed with: ${failure.message}');
         Sys.exit(1);
     });
   }

@@ -65,8 +65,9 @@ class Visitor implements Service {
   function generate(url:String):Promise<VisitorResult> {
     visited.push(url);
 
-    var name = url == '' ? 'index' : url;
-    trace('Visiting: ${name}');
+    var name = url == '' || url == '/' ? 'index' : url;
+    
+    Sys.println(' □ Visiting: ${name}');
 
     return new Promise((res, rej) -> {
       var context = kernal.createRouteContext();
@@ -85,10 +86,10 @@ class Visitor implements Service {
 
       tracker.status.observe(status -> switch status {
         case Ready | Waiting(0):
-          trace('Done');
+          Sys.println(' ■ Completed: $name');
           res(wrap(url, config, root.toConcrete().join('')));
         case Waiting(num):
-          trace('Waiting: ${num}');
+          Sys.println(' ◧ Waiting on: ${num} suspensions for $name');
       });
 
       () -> null; // ??
@@ -117,7 +118,11 @@ class Visitor implements Service {
   <body>
     ${before.join('\n    ')}
     <div id="${config.site.rootId}">${body}</div>
-    <script src=""></script>
+    <script src="${Path.join([
+      config.site.siteUrl,
+      config.site.assetPath,
+      'app.js'
+    ])}"></script>
   </body>
 </html>
     '.trim();

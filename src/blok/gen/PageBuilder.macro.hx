@@ -90,8 +90,7 @@ class PageBuilder {
             #else
               return switch findParentOfType(blok.gen.RouteContext) {
                 case Some(context):
-                  var config = context.getService(blok.gen.ConfigService).getConfig();
-                  var source = new blok.gen.datasource.CompiledDataSource(config.site.url);
+                  var source = context.getService(blok.gen.datasource.CompiledDataSource);
                   var path = haxe.io.Path.join([ $a{toParams.concat([ macro 'data.json' ])} ]);
                   return source.fetch(path);
                 case None: 

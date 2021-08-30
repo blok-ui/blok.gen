@@ -11,7 +11,7 @@ class App extends Component {
     return routes.provide(context -> PageRouter.provide({
       routes: routes,
       history: HistoryService.from(context).getHistory()
-    }, context -> switch PageRouter.from(context).route {
+    }, context -> PageRouter.observe(context, router -> switch router.route {
       case Ready(result):
         #if blok.gen.ssr
           blok.gen.ssr.Visitor
@@ -47,6 +47,6 @@ class App extends Component {
         );
       case None: 
         error('Not found');
-    }));
+    })));
   }
 }

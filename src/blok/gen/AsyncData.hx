@@ -47,4 +47,23 @@ class AsyncDataTools {
         Failed(e);
     }
   }
+
+  public static function toPromise<T>(data:AsyncData<T>):Promise<T> {
+    return new Promise((res, rej) -> {
+      switch data {
+        case None: 
+          // noop?
+        case Ready(data):
+          res(data);
+        case Loading(promise):
+          promise.handle(o -> switch o {
+            case Success(data): res(data);
+            case Failure(e): rej(e);
+          });
+        case Failed(e):
+          rej(e);
+      }
+      () -> null;
+    });
+  }
 }

@@ -2,17 +2,20 @@
 -cp example
 
 -lib tink_core
--lib tink_url
--lib capsule
 -lib blok.core.foundation
 
+-D debug
 -D js-es=6
+-D analyzer-optimize
+
+--dce full
 
 --each
 
 -lib hxnodejs
 -lib toml
 -lib markdown
+-lib boxup.compiler
 -lib blok.platform.static
 
 -D blok.gen.ssr
