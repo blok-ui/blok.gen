@@ -3,7 +3,7 @@ package blok.gen;
 import blok.core.foundation.routing.History;
 
 @service(fallback = new HistoryService(
-  #if blok.gen.ssr
+  #if blok.platform.static
     new blok.core.foundation.routing.history.StaticHistory('/')
   #else
     new blok.core.foundation.routing.history.BrowserHistory()

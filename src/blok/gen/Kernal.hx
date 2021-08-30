@@ -21,7 +21,8 @@ abstract class Kernal {
   public function createRouteContext() {
     var context = new RouteContext([ 
       config.asService(),
-      new HistoryService(createHistory()) 
+      new HistoryService(createHistory()),
+      new MetadataService(config)
     ], routes);
     for (factory in serviceFactories) context.addService(factory(context));
     return context;

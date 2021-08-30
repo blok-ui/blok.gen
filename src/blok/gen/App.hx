@@ -13,7 +13,7 @@ class App extends Component {
       history: HistoryService.from(context).getHistory()
     }, context -> PageRouter.observe(context, router -> switch router.route {
       case Ready(result):
-        #if blok.gen.ssr
+        #if blok.platform.static
           blok.gen.ssr.Visitor
             .from(context)
             .addResult(HistoryService.from(context).getLocation(), result);
@@ -30,7 +30,7 @@ class App extends Component {
             Suspend.suspend(resume -> {
               promise.handle(o -> switch o {
                 case Success(result):
-                  #if blok.gen.ssr
+                  #if blok.platform.static
                     blok.gen.ssr.Visitor
                       .from(context)
                       .addResult(HistoryService.from(context).getLocation(), result);

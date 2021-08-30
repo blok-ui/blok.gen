@@ -6,6 +6,7 @@ import blok.VNode;
 abstract class Page<T> extends Route<PageResult> {
   abstract public function decode(data:Dynamic):T;
   abstract public function render(data:T):VNode;
+  abstract public function metadata(data:T, meta:MetadataService):Void;
 
   public function getContext():RouteContext<PageResult> {
     return switch findParentOfType(RouteContext) {
@@ -14,5 +15,13 @@ abstract class Page<T> extends Route<PageResult> {
       case None:
         throw 'Could not find route context';
     }
+  }
+
+  final function createView(data:Dynamic):VNode {
+    var parsed = decode(data);
+    return MetadataService.use(meta -> {
+      metadata(parsed, meta);
+      render(parsed);
+    });
   }
 }

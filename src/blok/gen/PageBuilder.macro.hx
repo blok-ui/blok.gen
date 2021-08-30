@@ -85,7 +85,7 @@ class PageBuilder {
 
           var expr = f.expr;
           f.expr = macro {
-            #if blok.gen.ssr
+            #if blok.platform.static
               return $expr;
             #else
               return switch findParentOfType(blok.gen.RouteContext) {
@@ -126,12 +126,12 @@ class PageBuilder {
                 case Ready(data):
                   Some(Ready({
                     data: data,
-                    view: render(decode(data))
+                    view: createView(data)
                   }));
                 case Loading(promise):
                   Some(Loading(promise.next(data -> {
                     data: data,
-                    view: render(decode(data))
+                    view: createView(data)
                   })));
                 case Failed(error):
                   Some(Failed(error));

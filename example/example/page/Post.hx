@@ -2,6 +2,7 @@ package example.page;
 
 import blok.gen.AsyncData;
 import blok.gen.Page;
+import blok.gen.MetadataService;
 import example.data.BlogPost;
 
 using Blok;
@@ -28,6 +29,10 @@ class Post extends Page<PostWithSiblings> {
       prev: if (meta.prev != null) new BlogPost(meta.prev) else null,
       current: new BlogPost(data.field('data'))
     };
+  }
+
+  public function metadata(data:PostWithSiblings, meta:MetadataService) {
+    meta.setPageTitle('Post | ' + data.current.title);
   }
   
   public function render(posts:PostWithSiblings) {

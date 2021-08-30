@@ -1,9 +1,8 @@
 package example.page;
 
-import blok.gen.ConfigService;
-import blok.gen.RouteContext;
 import blok.gen.AsyncData;
 import blok.gen.Page;
+import blok.gen.MetadataService;
 import example.data.BlogPost;
 
 using Blok;
@@ -20,6 +19,10 @@ class Home extends Page<Array<BlogPost>> {
 
   public function decode(data:Dynamic):Array<BlogPost> {
     return (data.field('data'):Array<Dynamic>).map(BlogPost.new);
+  }
+
+  public function metadata(data:Array<BlogPost>, meta:MetadataService) {
+    meta.setPageTitle('Home'); 
   }
 
   public function render(posts:Array<BlogPost>) {

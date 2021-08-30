@@ -7,11 +7,11 @@ class PageLink extends Component {
   @prop var child:VNode;
   @use var router:PageRouter;
   @use var config:ConfigService;
-  #if blok.gen.ssr
+  #if blok.platform.static
     @use var visitor:blok.gen.ssr.Visitor;
   #end
   
-  #if blok.gen.ssr
+  #if blok.platform.static
     @before
     function visit() {
       visitor.visit(url);

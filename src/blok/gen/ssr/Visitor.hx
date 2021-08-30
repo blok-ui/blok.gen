@@ -73,6 +73,7 @@ class Visitor implements Service {
       var context = kernal.createRouteContext();
       var tracker = context.getService(SuspendTracker);
       var history = context.getService(HistoryService);
+      var meta = context.getService(MetadataService);
       var config = context.getService(ConfigService).getConfig();
 
       history.setLocation(url);
@@ -87,7 +88,7 @@ class Visitor implements Service {
       tracker.status.observe(status -> switch status {
         case Ready | Waiting(0):
           Sys.println(' ■ Completed: $name');
-          res(wrap(url, config, root.toConcrete().join('')));
+          res(wrap(url, meta, config, root.toConcrete().join('')));
         case Waiting(num):
           Sys.println(' ◧ Waiting on: ${num} suspensions for $name');
       });
@@ -96,7 +97,7 @@ class Visitor implements Service {
     });
   }
 
-  function wrap(url:String, config:Config, body:String):VisitorResult {
+  function wrap(url:String, meta:MetadataService, config:Config, body:String):VisitorResult {
     // todo: metadata and stuff
 
     // the following is pretty messy, but...
@@ -107,13 +108,13 @@ class Visitor implements Service {
     var json = if (result != null) {
       before.push('<script>window.$hashed = ${Json.stringify(result.data)}</script>');
       Json.stringify(result.data);
-    } else '';
+    } else '[]';
     var htmlPath = generateHtmlPath(url);
     var html = '
 <!doctype html>
 <html>
   <head>
-    <title>${config.site.siteTitle}</title>
+    <title>${meta.getPageTitle()}</title>
   </head>
   <body>
     ${before.join('\n    ')}

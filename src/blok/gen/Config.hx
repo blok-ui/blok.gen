@@ -3,7 +3,7 @@ package blok.gen;
 class Config implements Record {
   @prop var site:SiteConfig;
 
-  #if blok.gen.ssr
+  #if blok.platform.static
     @prop var ssrConfig:SsrConfig;
   #end
 
@@ -21,7 +21,7 @@ class SiteConfig implements Record {
   // @prop var globalAssets:Array<AssetType> = [];
 }
 
-#if blok.gen.ssr
+#if blok.platform.static
   class SsrConfig implements Record {
     @prop var source:String;
     @prop var destination:String;
