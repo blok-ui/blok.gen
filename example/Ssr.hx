@@ -1,4 +1,4 @@
-import blok.gen.ConfigService;
+import blok.gen.Config;
 import blok.gen.ssr.SsrKernal;
 import example.Blog.config;
 import example.Blog.routes;
@@ -9,7 +9,7 @@ using haxe.io.Path;
 function main() {
   var kernal = new SsrKernal(config, routes);
   kernal.addServiceFactory(ctx -> new BlogPostDataSource(
-    ctx.getService(ConfigService).getConfig().ssrConfig.source
+    ctx.getService(Config).ssr.source
   ));
   kernal.run();
 }

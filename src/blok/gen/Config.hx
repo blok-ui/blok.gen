@@ -1,24 +1,19 @@
 package blok.gen;
 
-class Config implements Record {
+@service(fallback = throw 'No config found')
+class Config implements Record implements Service {
   @prop var site:SiteConfig;
 
   #if blok.platform.static
-    @prop var ssrConfig:SsrConfig;
+    @prop var ssr:SsrConfig;
   #end
-
-  public function asService() {
-    return new ConfigService(this);
-  }
 }
 
 class SiteConfig implements Record {
   @prop var url:String;
-  @prop var siteTitle:String;
-  @prop var siteUrl:String;
+  @prop var title:String;
   @prop var rootId:String = 'root';
   @prop var assetPath:String = '/assets';
-  // @prop var globalAssets:Array<AssetType> = [];
 }
 
 #if blok.platform.static

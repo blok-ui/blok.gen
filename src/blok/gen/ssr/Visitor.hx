@@ -74,7 +74,7 @@ class Visitor implements Service {
       var tracker = context.getService(SuspendTracker);
       var history = context.getService(HistoryService);
       var meta = context.getService(MetadataService);
-      var config = context.getService(ConfigService).getConfig();
+      var config = context.getService(Config);
 
       history.setLocation(url);
       context.addService(this);
@@ -120,7 +120,7 @@ class Visitor implements Service {
     ${before.join('\n    ')}
     <div id="${config.site.rootId}">${body}</div>
     <script src="${Path.join([
-      config.site.siteUrl,
+      config.site.url,
       config.site.assetPath,
       'app.js'
     ])}"></script>

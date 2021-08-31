@@ -1,5 +1,6 @@
 package example.page;
 
+import example.ui.layout.DefaultLayout;
 import blok.gen.AsyncData;
 import blok.gen.Page;
 import blok.gen.MetadataService;
@@ -26,12 +27,14 @@ class Home extends Page<Array<BlogPost>> {
   }
 
   public function render(posts:Array<BlogPost>) {
-    return Html.div({},
-      Html.ul({}, ...[ for (post in posts) 
-        Html.li({},
-          Post.link(post.id, Html.text(post.title))
-        )  
-      ])
-    );
+    return DefaultLayout.node({ 
+      children: [
+        Html.ul({}, ...[ for (post in posts) 
+          Html.li({},
+            Post.link(post.id, Html.text(post.title))
+          )  
+        ])
+      ] 
+    });
   }
 }

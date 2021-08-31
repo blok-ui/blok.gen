@@ -12,13 +12,12 @@ import example.page.*;
 final config = new Config({
   site: new SiteConfig({
     url: 'http://localhost:5000',  
-    siteTitle: 'Test',
-    siteUrl: 'http://localhost:5000',
+    title: 'Test',
     rootId: 'root',
     assetPath: '/assets'
   }),
   #if blok.platform.static
-    ssrConfig: new SsrConfig({
+    ssr: new SsrConfig({
       source: Path.join([ Sys.programPath().directory().directory(), 'example/data' ]),
       destination: Path.join([ Sys.programPath().directory(), 'www' ])
     })

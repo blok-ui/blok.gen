@@ -1,6 +1,7 @@
 -cp src
 -cp example
 
+-lib nuke
 -lib tink_core
 -lib blok.core.foundation
 

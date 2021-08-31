@@ -19,10 +19,10 @@ class SsrKernal extends Kernal {
 
   public function run() {
     var visitor = new Visitor(this);
-    var writer = new FileWriter(config.ssrConfig.destination);
+    var writer = new FileWriter(config.ssr.destination);
 
     Sys.println('');
-    Sys.println('Starting to build "${config.site.siteTitle}":');
+    Sys.println('Starting to build "${config.site.title}":');
     Sys.println('');
 
     visitor.visit('/');

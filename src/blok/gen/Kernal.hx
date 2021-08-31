@@ -20,7 +20,7 @@ abstract class Kernal {
 
   public function createRouteContext() {
     var context = new RouteContext([ 
-      config.asService(),
+      config,
       new HistoryService(createHistory()),
       new MetadataService(config)
     ], routes);
@@ -31,12 +31,7 @@ abstract class Kernal {
   abstract public function createHistory():History;
 
   public function createApp(routes) {
-    return App.node({
-      routes: routes,
-      // todo
-      error: e -> blok.Html.text(e),
-      loading: blok.Html.text('loading')
-    });
+    return App.node({ routes: routes });
   }
 
   abstract public function run():Void;

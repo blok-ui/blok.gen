@@ -1,5 +1,6 @@
 package example.page;
 
+import example.ui.layout.DefaultLayout;
 import blok.gen.AsyncData;
 import blok.gen.Page;
 import blok.gen.MetadataService;
@@ -36,15 +37,17 @@ class Post extends Page<PostWithSiblings> {
   }
   
   public function render(posts:PostWithSiblings) {
-    return Html.div({},
-      Html.h1({}, Html.text(posts.current.title)),
-      Html.div({}, posts.current.content),
-      if (posts.prev != null) 
-        Post.link(posts.prev.id, Html.text('<-' + posts.prev.title)) 
-      else null,
-      if (posts.next != null) 
-        Post.link(posts.next.id, Html.text(posts.next.title + ' ->')) 
-      else null
-    );
+    return DefaultLayout.node({
+      children: [
+        Html.h1({}, Html.text(posts.current.title)),
+        Html.div({}, posts.current.content),
+        if (posts.prev != null) 
+          Post.link(posts.prev.id, Html.text('<-' + posts.prev.title)) 
+        else null,
+        if (posts.next != null) 
+          Post.link(posts.next.id, Html.text(posts.next.title + ' ->')) 
+        else null
+      ]
+    });
   }
 }
