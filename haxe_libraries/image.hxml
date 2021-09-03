@@ -1,0 +1,5 @@
+# @install: lix --silent download "haxelib:/image#0.2.0" into image/0.2.0/haxelib
+-lib asys
+-lib tink_core
+-cp ${HAXE_LIBCACHE}/image/0.2.0/haxelib/src
+-D image=0.2.0

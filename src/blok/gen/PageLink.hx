@@ -3,8 +3,9 @@ package blok.gen;
 using haxe.io.Path;
 
 class PageLink extends Component {
+  @prop var className:Null<String> = null;
   @prop var url:String;
-  @prop var child:VNode;
+  @prop var children:Array<VNode>;
   @use var router:PageRouter;
   @use var config:Config;
   #if blok.platform.static
@@ -20,11 +21,12 @@ class PageLink extends Component {
 
   function render() {
     return Html.a({
+      className: className,
       href: Path.join([ config.site.url, url  ]),
       onclick: e -> {
         e.preventDefault();
         router.setUrl(Path.join([ config.site.url, url ]));
       }
-    }, child);
+    }, ...children);
   }
 }

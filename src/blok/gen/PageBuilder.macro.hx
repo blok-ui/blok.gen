@@ -103,16 +103,58 @@ class PageBuilder {
           Context.error('`load` must be a function', loader.pos);
       }
       
+      var props:Array<Field> = [
+        { 
+          name: 'className', 
+          kind: FVar(macro:String), 
+          meta: [ { name: ':optional', pos: (macro null).pos } ],
+          pos: (macro null).pos
+        }
+      ];
+      var linkBody:Array<Expr> = [];
+      for (arg in args) {
+        var name = arg.name;
+        props.push({
+          name: name,
+          kind: FVar(arg.type),
+          meta: arg.opt == true
+            ? [ { name: ':optional', pos: (macro null).pos } ]
+            : [],
+          pos: (macro null).pos
+        });
+        linkBody.push(macro var $name = props.$name);
+      }
+      
+      var linkProps = TAnonymous(props);
+
+      linkBody.push(macro return blok.gen.PageLink.node({
+        className: props.className,
+        url: haxe.io.Path.join([ $a{toParams} ]),
+        children: children.toArray()
+      }));
+
       builder.addFields([
         {
           name: 'link',
           access: [ APublic, AStatic ],
           kind: FFun({
-            args: args.concat([ { name: 'child', type: macro:blok.VNode } ]),
-            expr: macro return blok.gen.PageLink.node({
-              url: haxe.io.Path.join([ $a{toParams} ]),
-              child: child
-            })
+            args: [
+              { name: 'props', type: macro:$linkProps },
+              { name: 'children', type: macro:haxe.Rest<blok.VNode> } 
+            ],
+            expr: macro $b{linkBody}
+          }),
+          pos: (macro null).pos
+        }
+      ]);
+      
+      builder.addFields([
+        {
+          name: 'getUrl',
+          access: [ APublic, AStatic ],
+          kind: FFun({
+            args: args,
+            expr: macro return haxe.io.Path.join([ $a{toParams} ])
           }),
           pos: (macro null).pos
         }

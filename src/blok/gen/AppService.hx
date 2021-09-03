@@ -3,33 +3,29 @@ package blok.gen;
 import blok.gen.ui.DefaultLoadingView;
 import blok.gen.ui.DefaultErrorView;
 
-@service(fallback = getInstance())
-class AppService implements Service {
-  static var instance:Null<AppService> = null;
+@service(fallback = getFallback())
+class AppService implements Record implements Service {
+  static var fallback:Null<AppService> = null;
 
-  static function getInstance() {
-    if (instance == null) {
-      instance = new AppService(
-        () -> DefaultLoadingView.node({}),
-        message -> DefaultErrorView.node({ message: message })
-      );      
+  static function getFallback() {
+    if (fallback == null) {
+      fallback = new AppService({
+        loadingView: DefaultLoadingView.node,
+        errorView: DefaultErrorView.node
+      });      
     }
-    return instance;
+    return fallback;
   }
 
-  final loadingView:()->VNode;
-  final errorView:(message:String)->VNode;
-
-  public function new(loadingView, errorView) {
-    this.loadingView = loadingView;
-    this.errorView = errorView;
-  }
+  @prop var loadingView:(props:{}, ?key:Key)->VNode;
+  @prop var errorView:(props:{ message:String }, ?key:Key)->VNode;
+  @prop var assets:AssetCollection = new AssetCollection([]);
 
   public inline function renderLoading() {
-    return loadingView();
+    return loadingView({});
   }
 
   public inline function renderError(message) {
-    return errorView(message);
+    return errorView({ message: message });
   }
 }

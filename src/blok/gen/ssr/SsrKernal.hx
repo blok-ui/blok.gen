@@ -7,6 +7,8 @@ import blok.core.foundation.routing.history.StaticHistory;
 using haxe.io.Path;
 
 class SsrKernal extends Kernal {
+  final hooks:Array<()->Void> = [];
+
   override function createRouteContext():RouteContext<PageResult> {
     var context = super.createRouteContext();
     context.addService(new SuspendTracker());
@@ -17,6 +19,10 @@ class SsrKernal extends Kernal {
     return new StaticHistory('/');
   }
 
+  public function onAfterGenerate(hook) {
+    hooks.push(hook);
+  }
+  
   public function run() {
     var visitor = new Visitor(this);
     var writer = new FileWriter(config.ssr.destination);
@@ -34,6 +40,10 @@ class SsrKernal extends Kernal {
         ]);
       })).handle(o -> switch o {
         case Success(_):
+          if (hooks.length > 0) {
+            for (hook in hooks) hook();
+          }
+
           Sys.println('');
           Sys.println('Build completed with no errors.');
           Sys.exit(0);

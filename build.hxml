@@ -14,6 +14,7 @@
 --each
 
 -lib hxnodejs
+-lib image
 -lib toml
 -lib markdown
 -lib boxup.compiler
@@ -28,5 +29,7 @@
 -lib blok.platform.dom
 
 -main Client
+
+-D nuke.ignore
 
 -js dist/www/assets/app.js

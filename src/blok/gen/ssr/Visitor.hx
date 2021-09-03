@@ -73,6 +73,7 @@ class Visitor implements Service {
       var context = kernal.createRouteContext();
       var tracker = context.getService(SuspendTracker);
       var history = context.getService(HistoryService);
+      var app = context.getService(AppService);
       var meta = context.getService(MetadataService);
       var config = context.getService(Config);
 
@@ -88,7 +89,7 @@ class Visitor implements Service {
       tracker.status.observe(status -> switch status {
         case Ready | Waiting(0):
           Sys.println(' ■ Completed: $name');
-          res(wrap(url, meta, config, root.toConcrete().join('')));
+          res(wrap(url, app,  meta, config, root.toConcrete().join('')));
         case Waiting(num):
           Sys.println(' ◧ Waiting on: ${num} suspensions for $name');
       });
@@ -97,11 +98,30 @@ class Visitor implements Service {
     });
   }
 
-  function wrap(url:String, meta:MetadataService, config:Config, body:String):VisitorResult {
+  function wrap(
+    url:String, 
+    app:AppService,
+    meta:MetadataService, 
+    config:Config, 
+    body:String
+  ):VisitorResult {
     // todo: metadata and stuff
 
     // the following is pretty messy, but...
+    var head:Array<String> = [ for (asset in app.assets) switch asset {
+      case AssetCss(path, local):
+        if (local) path = Path.join([ config.site.url, config.site.assetPath, path ]);
+        '<link rel="stylesheet" href="${path.withExtension('css')}"/>';
+      case AssetJs(_, _):
+        null;
+    } ].filter(s -> s != null);
     var before:Array<String> = [];
+    var after:Array<String> = [ for (asset in app.assets) switch asset {
+      case AssetJs(path, local):
+        if (local) path = Path.join([ config.site.url, config.site.assetPath, path ]);
+        '<script src="${path}"></script>';
+      default: null;
+    } ].filter(s -> s != null);
     var jsonPath = generateJsonPath(url);
     var hashed = '__blok_gen_' + jsonPath.hash();
     var result = results.get(url);
@@ -115,10 +135,12 @@ class Visitor implements Service {
 <html>
   <head>
     <title>${meta.getPageTitle()}</title>
+    ${head.join('\n    ')}
   </head>
   <body>
     ${before.join('\n    ')}
     <div id="${config.site.rootId}">${body}</div>
+    ${after.join('\n    ')}
     <script src="${Path.join([
       config.site.url,
       config.site.assetPath,

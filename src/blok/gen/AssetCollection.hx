@@ -1,0 +1,24 @@
+package blok.gen;
+
+@:forward(iterator)
+abstract AssetCollection(Array<AssetType>) from Array<AssetType> {
+  public function new(assets) {
+    this = assets;
+  }
+
+  public function addLocalCss(path:String) {
+    this.push(AssetCss(path, true));
+  }
+
+  public function addExternalCss(path:String) {
+    this.push(AssetCss(path, false));
+  }
+
+  public function addLocalJs(path:String) {
+    this.push(AssetJs(path, true));
+  }
+
+  public function addExternalJs(path:String) {
+    this.push(AssetJs(path, false));
+  }
+}

@@ -5,14 +5,14 @@ import haxe.Timer;
 
 using tink.CoreApi;
 
-enum AsyncWrapperStatus {
+enum AsyncContainerStatus {
   Ready(vnode:VNode);
   Pending(vnode:VNode);
   Loading(promise:Promise<PageResult>);
 }
 
-class AsyncWrapper extends Component {
-  @prop var status:AsyncWrapperStatus;
+class AsyncContainer extends Component {
+  @prop var status:AsyncContainerStatus;
   @prop var wait:Int = 1000;
   @prop var loading:()->VNode;
   @prop var error:(e:String)->VNode;
@@ -24,17 +24,13 @@ class AsyncWrapper extends Component {
   function prepare() {
     cleanupTimer();
     switch status {
-      case Ready(vnode):
-        cleanupLink();
-        previous = vnode;
       case Loading(_):
         cleanupLink();
         timer = Timer.delay(() -> switch __status {
           case WidgetValid: showLoading();
           default:
         }, wait);
-      case Pending(_):
-        previous = null;
+      default:
     }
   }
 
@@ -76,8 +72,11 @@ class AsyncWrapper extends Component {
   function render() {
     return Suspend.await(
       () -> switch status {
-        case Pending(vnode) | Ready(vnode): 
+        case Pending(vnode):
+          previous = null;
           vnode;
+        case Ready(vnode):
+          previous = vnode;
         case Loading(promise):
           Suspend.suspend(resume -> {
             link = promise.handle(o -> switch o {
@@ -90,7 +89,9 @@ class AsyncWrapper extends Component {
             });
           });
       },
-      () -> previous == null ? loading() : previous
+      () -> {
+        previous == null ? loading() : previous;
+      }
     );
   }
 }

@@ -2,7 +2,7 @@ package blok.gen;
 
 @service(fallback = new MetadataService(Config.from(context)))
 class MetadataService implements Service {
-  public final config:Config;
+  final config:Config;
   var pageTitle:String = null;
 
   public function new(config) {
