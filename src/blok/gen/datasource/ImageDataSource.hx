@@ -22,7 +22,7 @@ typedef ImageEntry = {
 }
 
 // @todo: make more configurable
-class ImageDataSource {
+class ImageDataSource implements DataSource {
   static final mediumSize = 900;
   static final thumbSize = 200;
 

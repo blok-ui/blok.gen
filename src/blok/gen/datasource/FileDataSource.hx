@@ -13,7 +13,7 @@ using tink.CoreApi;
 //
 //        In general, I think we need to take another look at AsyncData --
 //        it really only is needed when hydrating an app.
-class FileDataSource {
+class FileDataSource implements DataSource {
   final root:String;
   final cache:Map<String, Dynamic> = [];
 

@@ -5,7 +5,7 @@ import js.Browser.window;
 using tink.CoreApi;
 using haxe.io.Path;
 
-class HttpDataSource {
+class HttpDataSource implements DataSource {
   final root:String;
 
   public function new(root) {

@@ -127,7 +127,7 @@ class Visitor implements Service {
     var result = results.get(url);
     var json = if (result != null) {
       before.push('<script>window.$hashed = ${Json.stringify(result.data)}</script>');
-      Json.stringify(result.data);
+      #if debug Json.stringify(result.data, null, '  '); #else Json.stringify(result.data); #end
     } else '[]';
     var htmlPath = generateHtmlPath(url);
     var html = '
