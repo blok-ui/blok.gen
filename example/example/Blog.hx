@@ -34,7 +34,7 @@ final routes:Array<Route<PageResult>> = [
   new PostArchive()
 ];
 
-final services:Array<ServiceFactory<PageResult>> = [
+final services:Array<ServiceFactory> = [
   ctx -> new AppService({
     loadingView: LoadingView.node,
     errorView: ErrorView.node,

@@ -1,3 +1,3 @@
 package blok.gen;
 
-typedef ServiceFactory<T> = (context:RouteContext<PageResult>)->ServiceProvider;
+typedef ServiceFactory = (context:Context)->ServiceProvider;
