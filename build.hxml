@@ -23,6 +23,7 @@
 -main Ssr
 
 -js dist/build.js
+-cmd node dist/build
 
 --next
 

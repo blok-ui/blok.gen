@@ -8,10 +8,10 @@ abstract class Page<T> extends Route<PageResult> {
   abstract public function render(data:T):VNode;
   abstract public function metadata(data:T, meta:MetadataService):Void;
 
-  public function getContext():RouteContext<PageResult> {
+  public function getContext():Context {
     return switch findParentOfType(RouteContext) {
       case Some(context): 
-        context;
+        context.getContext();
       case None:
         throw 'Could not find route context';
     }

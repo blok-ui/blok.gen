@@ -12,7 +12,6 @@ class RouteCollection<T> extends Route<T> {
     this.prefix = prefix;
     for (child in children) addChild(child);
   }
-  
 
   override public function match(url:String):Option<AsyncData<T>> {
     if (prefix != null) {

@@ -14,8 +14,8 @@ using tink.CoreApi;
 @page(route = '/')
 class Home extends Page<Array<BlogPost>> {
   public function load():AsyncData<Dynamic> {
-    return getContext()
-      .getService(example.datasource.BlogPostDataSource)
+    return example.datasource.BlogPostDataSource
+      .from(getContext())
       .findPosts(0, 3);
   }
 

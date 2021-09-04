@@ -1,5 +1,6 @@
 package blok.gen.datasource;
 
+import blok.gen.data.Content;
 import sys.io.File;
 import sys.FileSystem;
 
@@ -7,12 +8,29 @@ using Lambda;
 using haxe.io.Path;
 using tink.CoreApi;
 
+// @todo: It might be a lot simpler to return Promises from this DataSource
+//        rather than AsyncData.
+//
+//        In general, I think we need to take another look at AsyncData --
+//        it really only is needed when hydrating an app.
 class FileDataSource {
   final root:String;
   final cache:Map<String, Dynamic> = [];
 
   public function new(root) {
     this.root = root;
+  }
+  
+  public function listFolders(path:String):AsyncData<Array<String>> {
+    var fullPath = Path.join([ root, path ]);
+
+    if (!FileSystem.exists(fullPath) || !FileSystem.isDirectory(fullPath)) {
+      return Failed(new Error(404, '${fullPath} is not a directory'));
+    }
+    
+    return Ready(FileSystem
+      .readDirectory(fullPath)
+      .filter(p -> FileSystem.isDirectory(Path.join([ fullPath, p ]))));
   }
 
   public function list(path:String, filter:(name:String)->Bool):AsyncData<Array<FileResult>> {
