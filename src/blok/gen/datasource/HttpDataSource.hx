@@ -1,11 +1,13 @@
 package blok.gen.datasource;
 
 import js.Browser.window;
+import blok.gen.Config;
 
 using tink.CoreApi;
 using haxe.io.Path;
 
-class HttpDataSource implements DataSource {
+@service(fallback = new HttpDataSource(Config.from(context).site.url))
+class HttpDataSource implements Service {
   final root:String;
 
   public function new(root) {

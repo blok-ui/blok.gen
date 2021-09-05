@@ -1,7 +1,7 @@
 package blok.gen;
 
 @service(fallback = throw 'No config found')
-class Config implements Record implements Service {
+class Config implements Service implements Record {
   @prop var site:SiteConfig;
 
   #if blok.platform.static

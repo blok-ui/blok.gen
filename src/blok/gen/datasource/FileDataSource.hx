@@ -1,8 +1,8 @@
 package blok.gen.datasource;
 
-import blok.gen.data.Content;
 import sys.io.File;
 import sys.FileSystem;
+import blok.gen.Config;
 
 using Lambda;
 using haxe.io.Path;
@@ -13,7 +13,8 @@ using tink.CoreApi;
 //
 //        In general, I think we need to take another look at AsyncData --
 //        it really only is needed when hydrating an app.
-class FileDataSource implements DataSource {
+@service(fallback = new FileDataSource(Config.from(context).ssr.source))
+class FileDataSource implements Service {
   final root:String;
   final cache:Map<String, Dynamic> = [];
 

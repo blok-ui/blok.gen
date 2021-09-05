@@ -22,7 +22,14 @@ typedef ImageEntry = {
 }
 
 // @todo: make more configurable
-class ImageDataSource implements DataSource {
+@service(fallback = new ImageDataSource(
+  Config.from(context).ssr.source,
+  Path.join([
+    Config.from(context).ssr.destination,
+    Config.from(context).site.assetPath
+  ])
+))
+class ImageDataSource implements Service {
   static final mediumSize = 900;
   static final thumbSize = 200;
 

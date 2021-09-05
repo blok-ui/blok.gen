@@ -17,11 +17,9 @@ using tink.CoreApi;
 @service(isOptional)
 class BlogPostDataSource implements Service {
   final formatter = new MarkdownFormatter(new TomlFormatter());
-  final source:FileDataSource;
+  @use var source:FileDataSource;
 
-  public function new(root) {
-    source = new FileDataSource(root);
-  }
+  public function new() {}
 
   public function getPost(id:Id<BlogPost>) {
     return base().flatMap(posts -> {

@@ -3,6 +3,7 @@ package blok.gen.client;
 import js.Browser;
 import blok.dom.Platform;
 import blok.core.foundation.routing.history.BrowserHistory;
+import blok.gen.datasource.HttpDataSource;
 import blok.gen.datasource.CompiledDataSource;
 
 class ClientKernal extends Kernal {
@@ -12,7 +13,8 @@ class ClientKernal extends Kernal {
 
   override function createRouteContext():RouteContext<PageResult> {
     var context = super.createRouteContext();
-    context.addService(new CompiledDataSource(config.site.url));
+    context.addService(new HttpDataSource(config.site.url));
+    context.addService(new CompiledDataSource());
     return context;
   }
 

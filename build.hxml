@@ -13,6 +13,16 @@
 
 --each
 
+-lib blok.platform.dom
+
+-main Client
+
+-D nuke.ignore
+
+-js dist/www/assets/app.js
+
+--next
+
 -lib hxnodejs
 -lib image
 -lib toml
@@ -24,13 +34,3 @@
 
 -js dist/build.js
 -cmd node dist/build
-
---next
-
--lib blok.platform.dom
-
--main Client
-
--D nuke.ignore
-
--js dist/www/assets/app.js

@@ -10,6 +10,9 @@ import example.ui.status.ErrorView;
 import example.ui.status.LoadingView;
 
 #if blok.platform.static
+  import blok.gen.datasource.FileDataSource;
+  import example.datasource.BlogPostDataSource;
+
   using haxe.io.Path;
 #end
 
@@ -42,6 +45,9 @@ final services:Array<ServiceFactory> = [
       AssetCss('styles.css', true),
       AssetCss('https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css', false)
     ]
-  })
+  }),
+  #if blok.platform.static
+    ctx -> new FileDataSource(Config.from(ctx).ssr.source),
+    ctx -> new BlogPostDataSource()
+  #end
 ];
-
