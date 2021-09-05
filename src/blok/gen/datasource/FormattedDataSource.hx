@@ -31,16 +31,20 @@ class FormattedDataSource implements Service {
   }
 
   public function get(path:String) {
-    source.get(path).flatMap(parse);
+    return source.get(path).flatMap(parse);
   }
 
   function parse(file:FileResult):AsyncData<Dynamic> {
     return switch formatters.find(file.meta.extension) {
       case null: Failed(new Error(404, 'No formatter exists for the extension ${file.meta.extension}'));
-      case formatter: Loading({
-        file: file,
-        parsed: formatter.parse(file)
-      });
+      case formatter: Loading(
+        formatter
+          .parse(file)
+          .next(data -> Promise.resolve({
+            file: file,
+            parsed: data
+          }))
+        );
     };
   }
 }
