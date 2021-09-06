@@ -19,8 +19,7 @@ typedef PostWithSiblings = {
 
 class Post extends Page<PostWithSiblings> {
   public function load(id:String):AsyncData<Dynamic> {
-    return getContext()
-      .getService(example.datasource.BlogPostDataSource)
+    return getService(example.datasource.BlogPostDataSource)
       .getPost(id);
   }
 

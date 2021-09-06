@@ -22,7 +22,7 @@ class FormattedDataSource implements Service {
     return source.listFolders(path);
   }
 
-  public function list(path:String, filter) {
+  public function list<T:{}>(path:String, filter):AsyncData<Array<FormattedFileResult<T>>> {
     return source
       .list(path, filter)
       .flatMap(files -> Loading(Promise.inParallel([ 
@@ -30,19 +30,20 @@ class FormattedDataSource implements Service {
       ])));
   }
 
-  public function get(path:String) {
+  public function get<T:{}>(path:String):AsyncData<FormattedFileResult<T>> {
     return source.get(path).flatMap(parse);
   }
 
-  function parse(file:FileResult):AsyncData<Dynamic> {
+  function parse<T:{}>(file:FileResult):AsyncData<FormattedFileResult<T>> {
     return switch formatters.find(file.meta.extension) {
       case null: Failed(new Error(404, 'No formatter exists for the extension ${file.meta.extension}'));
       case formatter: Loading(
         formatter
           .parse(file)
           .next(data -> Promise.resolve({
-            file: file,
-            parsed: data
+            meta: file.meta,
+            content: file.content,
+            formatted: data
           }))
         );
     };

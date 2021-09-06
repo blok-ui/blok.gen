@@ -75,8 +75,8 @@ abstract Content({}) from {} {
         Fragment.node({
           children: (json.field('children'):Array<Content>).map(c -> c.toVNode())
         });
-      default:
-        throw 'Invalid node type';
+      case other:
+        throw 'Invalid node type: $other';
     }
   }
 }

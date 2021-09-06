@@ -3,10 +3,8 @@ package example.datasource;
 import blok.gen.AsyncData;
 import blok.Service;
 import blok.gen.data.Id;
-import blok.gen.datasource.FileResult;
-import blok.gen.datasource.FileDataSource;
-import blok.gen.datasource.file.TomlFormatter;
-import blok.gen.datasource.file.MarkdownFormatter;
+import blok.gen.datasource.FormattedFileResult;
+import blok.gen.datasource.FormattedDataSource;
 import example.data.BlogPost;
 
 using Reflect;
@@ -14,10 +12,9 @@ using Lambda;
 using haxe.io.Path;
 using tink.CoreApi;
 
-@service(isOptional)
+@service(fallback = new BlogPostDataSource())
 class BlogPostDataSource implements Service {
-  final formatter = new MarkdownFormatter(new TomlFormatter());
-  @use var source:FileDataSource;
+  @use var source:FormattedDataSource;
 
   public function new() {}
 
@@ -28,19 +25,13 @@ class BlogPostDataSource implements Service {
       var prev = posts[index - 1];
       var next = posts[index + 1];
       
-      return Loading(Promise.inParallel([
-        prev == null ? Promise.resolve(null) : decode(prev),
-        decode(post),
-        next == null ? Promise.resolve(null) : decode(next)
-      ]).next(posts -> {
-        Promise.resolve({
-          meta: {
-            prev: posts[0],
-            next: posts[2]
-          },
-          data: posts[1]
-        });
-      }));
+      return Ready({
+        meta: {
+          prev: prev == null ? null : decode(prev),
+          next: next == null ? null : decode(next)
+        },
+        data: decode(post)
+      });
     });
   }
 
@@ -53,22 +44,21 @@ class BlogPostDataSource implements Service {
 
       var startIndex = files.indexOf(data[0]);
       var endIndex = files.indexOf(data[data.length - 1]);
+      var posts = data.map(decode);
 
-      return Loading(Promise
-        .inParallel(data.map(decode))
-        .next(posts -> Promise.resolve({
-          meta: {
-            startIndex: startIndex,
-            endIndex: endIndex,
-            count: posts.length,
-            total: files.length
-          },
-          data: posts
-        })));
+      return Ready({
+        meta: {
+          startIndex: startIndex,
+          endIndex: endIndex,
+          count: posts.length,
+          total: files.length
+        },
+        data: posts
+      });
     });
   }
 
-  function base():AsyncData<Array<FileResult>> {
+  function base():AsyncData<Array<FormattedFileResult<{}>>> {
     return source
       .list('post', path -> path.extension() == 'md')
       .map(posts -> {
@@ -77,13 +67,11 @@ class BlogPostDataSource implements Service {
       });
   }
 
-  function decode(file:FileResult) {
-    return formatter
-      .parse(file)
-      .next(data -> Promise.resolve(new BlogPost({
-        id: file.meta.name,
-        title: data.data.title,
-        content: data.content
-      }).toJson()));
+  function decode(file:FormattedFileResult<{}>):{} {
+    return new BlogPost({
+      id: file.meta.name,
+      title: (file.formatted.field('data'):{}).field('title'),
+      content: (file.formatted.field('content'):String)
+    }).toJson();
   }
 }

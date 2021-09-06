@@ -4,7 +4,7 @@ import js.Browser.window;
 
 using Reflect;
 using tink.CoreApi;
-using blok.tools.ObjectTools;
+using blok.gen.tools.PathTools;
 
 @service(fallback = new CompiledDataSource())
 class CompiledDataSource implements Service {
@@ -13,7 +13,7 @@ class CompiledDataSource implements Service {
   public function new() {}
 
   public function fetch<T>(path:String):AsyncData<T> {
-    var hashed = '__blok_gen_' + path.hash();
+    var hashed = path.toHashedProperty();
     if (window.hasField(hashed)) {
       return Ready(window.field(hashed));
     }

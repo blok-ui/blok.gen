@@ -82,7 +82,13 @@ class PageBuilder {
           pattern = url == '/'
             ? macro [] | [ '' ]
             : macro [ $a{route} ];
-
+            
+          // @todo: This works, but it's super weird behavior. I'm not sure
+          //        what a better option is though -- I'd like to *not*
+          //        force the user to write the CompiledData boilerplate
+          //        themselves.
+          //
+          //        Maybe we just need to document it better?
           var expr = f.expr;
           f.expr = macro {
             #if blok.platform.static

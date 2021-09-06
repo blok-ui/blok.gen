@@ -21,11 +21,10 @@ typedef PostArchiveWithPagination = {
 
 @page(route = 'post-archive')
 class PostArchive extends Page<PostArchiveWithPagination> {
-  static final perPage:Int = 3;
+  static final perPage:Int = 2;
 
   public function load(page:Int):AsyncData<Dynamic> {
-    return getContext()
-      .getService(example.datasource.BlogPostDataSource)
+    return getService(example.datasource.BlogPostDataSource)
       .findPosts(page.toIndex(perPage), perPage);
   }
 

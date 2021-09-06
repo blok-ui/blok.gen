@@ -1,12 +1,12 @@
 package blok.gen.datasource;
 
 typedef FileResult = {
-  meta:{
+  public final meta:{
     path:String,
     name:String,
     extension:String,
     created:Date,
     updated:Date
-  },
-  content:String
+  };
+  public final content:String;
 }

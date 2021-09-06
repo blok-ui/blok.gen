@@ -8,6 +8,7 @@ using StringTools;
 using tink.CoreApi;
 using haxe.io.Path;
 using blok.tools.ObjectTools;
+using blok.gen.tools.PathTools;
 
 typedef VisitorResult = {
   public final htmlPath:String;
@@ -123,7 +124,7 @@ class Visitor implements Service {
       default: null;
     } ].filter(s -> s != null);
     var jsonPath = generateJsonPath(url);
-    var hashed = '__blok_gen_' + jsonPath.hash();
+    var hashed = jsonPath.toHashedProperty();
     var result = results.get(url);
     var json = if (result != null) {
       before.push('<script>window.$hashed = ${Json.stringify(result.data)}</script>');

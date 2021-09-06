@@ -11,6 +11,9 @@ import example.ui.status.LoadingView;
 
 #if blok.platform.static
   import blok.gen.datasource.FileDataSource;
+  import blok.gen.datasource.FormattedDataSource;
+  import blok.gen.datasource.file.TomlFormatter;
+  import blok.gen.datasource.file.MarkdownFormatter;
   import example.datasource.BlogPostDataSource;
 
   using haxe.io.Path;
@@ -48,6 +51,9 @@ final services:Array<ServiceFactory> = [
   }),
   #if blok.platform.static
     ctx -> new FileDataSource(Config.from(ctx).ssr.source),
+    ctx -> new FormattedDataSource([
+      'md' => new MarkdownFormatter(new TomlFormatter())
+    ]),
     ctx -> new BlogPostDataSource()
   #end
 ];
