@@ -84,6 +84,9 @@ class AsyncContainer extends Component {
                 setView(result.view);
                 resume();
               case Failure(failure):
+                #if blok.platform.static
+                  throw failure;
+                #end
                 setPendingView(error(failure.message));
                 resume();
             });

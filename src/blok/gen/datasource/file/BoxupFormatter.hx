@@ -1,5 +1,6 @@
 package blok.gen.datasource.file;
 
+import boxup.Source;
 import boxup.Node;
 import boxup.Parser;
 import boxup.Scanner;
@@ -26,11 +27,13 @@ class BoxupFormatter<T> implements Formatter<T> {
 
   public function parse(file:FileResult):Promise<T> {
     return new Promise((res, rej) -> {
+      var source:Source = {
+        content: file.content,
+        file: file.meta.path
+      };
+
       Scanner
-        .scan({
-          content: file.content,
-          file: file.meta.path
-        })
+        .scan(source)
         .map(Parser.parse)
         .handleValue(nodes -> {
           nodes
@@ -40,13 +43,15 @@ class BoxupFormatter<T> implements Formatter<T> {
                 case Success(schema): 
                   compile(schema, nodes)
                     .handleValue(res)
-                    .handleError(e -> rej(new Error(500, e.message)));
+                    .handleError(e -> config.reporter.report(e, source))
+                    .handleError(e -> rej(new Error(500, 'Could not compile boxup:' + e.message)));
                 case Failure(e):
                   rej(e);
               });
             })
             .handleError(e -> rej(new Error(500, e.message)));
         });
+
       () -> null;
     });
   }

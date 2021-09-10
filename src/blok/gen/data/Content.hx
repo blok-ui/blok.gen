@@ -55,8 +55,16 @@ abstract Content({}) from {} {
     }
   }
 
+  public static function fromJson(data:Dynamic) {
+    return new Content(data);
+  }
+
   public function new(value) {
     this = value;
+  }
+
+  @:to public function toJson():Dynamic {
+    return this;
   }
 
   @:to public function toVNode():VNode {

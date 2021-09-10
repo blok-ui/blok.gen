@@ -41,8 +41,18 @@ class ImageDataSource implements Service {
     this.sourceRoot = sourceRoot;
   }
 
+  public function list(path:String):AsyncData<Array<String>> {
+    var src = Path.join([ sourceRoot, path ]);
+    if (!FileSystem.exists(src)) return Failed(new Error(404, 'No gallery exists'));
+    return Ready(FileSystem.readDirectory(src).filter(isVaildExtendion));
+  }
+
   public function fetch(entries:Array<ImageEntry>):AsyncData<Array<ImageInfo>> {
     return Loading(Promise.inParallel([ for (e in entries) process(e) ]));
+  }
+  
+  function isVaildExtendion(src:String) {
+    return [ 'jpg', 'png' ].contains(src.extension());
   }
 
   function process(entry:ImageEntry):Promise<ImageInfo> {
@@ -56,10 +66,6 @@ class ImageDataSource implements Service {
     ]);
     var dir = dest.directory();
 
-    function isVaildExtendion() {
-      return [ 'jpg', 'png' ].contains(src.extension());
-    }
-
     if (!src.exists()) {
       return new Error(404, 'No image exists at ${src}');
     }
@@ -67,7 +73,7 @@ class ImageDataSource implements Service {
     if (dest.exists()) {
       var destAge = dest.stat().mtime.getTime();
       var srcAge = src.stat().mtime.getTime();
-      if (srcAge <= destAge) return if (isVaildExtendion()) 
+      if (srcAge <= destAge) return if (isVaildExtendion(src)) 
         Image.getInfo(src);
       else
         return Promise.resolve(({
@@ -82,7 +88,7 @@ class ImageDataSource implements Service {
       dir.createDirectory();
     }
 
-    if (!isVaildExtendion()) {
+    if (!isVaildExtendion(src)) {
       src.copy(dest);
       return Promise.resolve(({
         width: 0,
