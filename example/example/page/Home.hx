@@ -2,7 +2,6 @@ package example.page;
 
 import example.ui.elements.Container;
 import example.ui.layout.DefaultLayout;
-import blok.gen.AsyncData;
 import blok.gen.Page;
 import blok.gen.MetadataService;
 import example.data.BlogPost;
@@ -13,7 +12,7 @@ using tink.CoreApi;
 
 @page(route = '/')
 class Home extends Page<Array<BlogPost>> {
-  public function load():AsyncData<Dynamic> {
+  public function load() {
     return getService(example.datasource.BlogPostDataSource)
       .findPosts(0, 3);
   }

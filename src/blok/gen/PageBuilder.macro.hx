@@ -60,8 +60,10 @@ class PageBuilder {
 
       switch loader.kind {
         case FFun(f):
-          if (f.ret == null || !Context.unify(f.ret.toType(), Context.getType('blok.gen.AsyncData'))) {
-            Context.error('`load` must return a blok.gen.AsyncData', loader.pos);
+          if (f.ret != null && Context.unify(f.ret.toType(), Context.getType('blok.gen.LoadingResult'))) {
+            Context.error('`load` must return a blok.gen.LoadingResult', loader.pos);
+          } else if (f.ret == null) {
+            f.ret = macro:blok.gen.LoadingResult<Dynamic>;
           }
 
           args = f.args;
@@ -98,9 +100,12 @@ class PageBuilder {
                 case Some(context):
                   var source = context.getService(blok.gen.datasource.CompiledDataSource);
                   var path = haxe.io.Path.join([ $a{toParams.concat([ macro 'data.json' ])} ]);
-                  return source.fetch(path);
+                  return switch source.preload(path) {
+                    case Some(data): blok.gen.LoadingResult.ofData(data);
+                    case None: source.fetch(path);
+                  }
                 case None: 
-                  Failed(new tink.core.Error(500, 'RouteContext not available'));
+                  blok.gen.LoadingResult.ofError(new tink.core.Error(500, 'RouteContext not available'));
               }
             #end
           }
@@ -167,22 +172,22 @@ class PageBuilder {
       ]);
 
       return macro class {
-        override public function match(url:String):haxe.ds.Option<blok.gen.AsyncData<blok.gen.PageResult>> {
+        override public function match(url:String):haxe.ds.Option<blok.gen.LoadingResult<blok.gen.PageResult>> {
           return switch blok.gen.tools.PathTools.prepareUrl(url).split('/') {
             case ${pattern}:
-              switch load($a{fromParams}) {
+              switch load($a{fromParams}).unwrap() {
                 case Ready(data):
-                  Some(Ready({
+                  Some(blok.gen.LoadingResult.ofData({
                     data: data,
                     view: createView(data)
                   }));
                 case Loading(promise):
-                  Some(Loading(promise.next(data -> {
+                  Some(blok.gen.LoadingResult.ofPromise(promise.next(data -> {
                     data: data,
                     view: createView(data)
                   })));
-                case Failed(error):
-                  Some(Failed(error));
+                case Failure(error):
+                  Some(blok.gen.LoadingResult.ofError(error));
                 case None:
                   None;
               }

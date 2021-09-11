@@ -14,11 +14,11 @@ class HttpDataSource implements Service {
     this.root = root;
   }
 
-  public function fetch<T>(path:String):AsyncData<T> {
+  public function fetch<T>(path:String):Promise<T> {
     var url = Path.join([ root, path ]);
-    return Loading(window
+    return window
       .fetch(url, { credentials: INCLUDE })
       .toPromise()
-      .next(res -> res.json()));
+      .next(res -> res.json());
   }
 }

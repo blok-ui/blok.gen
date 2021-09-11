@@ -13,7 +13,7 @@ class RouteCollection<T> extends Route<T> {
     for (child in children) addChild(child);
   }
 
-  override public function match(url:String):Option<AsyncData<T>> {
+  override public function match(url:String):Option<LoadingResult<T>> {
     if (prefix != null) {
       if (!url.prepareUrl().startsWith(prefix)) return None;
       url = url.prepareUrl().substr(prefix.length);

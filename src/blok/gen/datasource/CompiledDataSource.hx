@@ -12,11 +12,15 @@ class CompiledDataSource implements Service {
   
   public function new() {}
 
-  public function fetch<T>(path:String):AsyncData<T> {
+  public function preload<T>(path:String):Option<T> {
     var hashed = path.toHashedProperty();
     if (window.hasField(hashed)) {
-      return Ready(window.field(hashed));
+      return Some(window.field(hashed));
     }
+    return None;
+  }
+
+  public function fetch<T>(path:String):Promise<T> {
     return http.fetch(path);
   }
 }

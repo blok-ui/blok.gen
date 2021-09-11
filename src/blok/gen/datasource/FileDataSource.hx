@@ -8,11 +8,6 @@ using Lambda;
 using haxe.io.Path;
 using tink.CoreApi;
 
-// @todo: It might be a lot simpler to return Promises from this DataSource
-//        rather than AsyncData.
-//
-//        In general, I think we need to take another look at AsyncData --
-//        it really only is needed when hydrating an app.
 @service(fallback = new FileDataSource(Config.from(context).ssr.source))
 class FileDataSource implements Service {
   final root:String;
@@ -22,48 +17,48 @@ class FileDataSource implements Service {
     this.root = root;
   }
   
-  public function listFolders(path:String):AsyncData<Array<String>> {
+  public function listFolders(path:String):Promise<Array<String>> {
     var fullPath = Path.join([ root, path ]);
 
     if (!FileSystem.exists(fullPath) || !FileSystem.isDirectory(fullPath)) {
-      return Failed(new Error(404, '${fullPath} is not a directory'));
+      return Promise.reject(new Error(404, '${fullPath} is not a directory'));
     }
     
-    return Ready(FileSystem
+    return Promise.resolve(FileSystem
       .readDirectory(fullPath)
       .filter(p -> FileSystem.isDirectory(Path.join([ fullPath, p ]))));
   }
 
-  public function list(path:String, filter:(name:String)->Bool):AsyncData<Array<FileResult>> {
+  public function list(path:String, filter:(name:String)->Bool):Promise<Array<FileResult>> {
     if (cache.exists(path)) {
-      return Ready(cache.get(path));
+      return Promise.resolve(cast cache.get(path));
     }
 
     var fullPath = Path.join([ root, path ]);
 
     if (!FileSystem.exists(fullPath) || !FileSystem.isDirectory(fullPath)) {
-      return Failed(new Error(404, '${fullPath} is not a directory'));
+      return Promise.reject(new Error(404, '${fullPath} is not a directory'));
     }
 
     var paths = FileSystem.readDirectory(fullPath).filter(filter);
    
-    return Loading(Promise.inParallel([ 
+    return Promise.inParallel([ 
       for (file in paths) read(Path.join([ path, file ]))
     ]).next(files -> {
       cache.set(fullPath, files);
       files;
-    }));
+    });
   }
 
-  public function get(path:String):AsyncData<FileResult> {
+  public function get(path:String):Promise<FileResult> {
     if (cache.exists(path)) {
-      return Ready(cache.get(path));
+      return Promise.resolve(cast cache.get(path));
     }
 
-    return Loading(read(path).next(file -> {
+    return read(path).next(file -> {
       cache.set(path, file);
       file;
-    }));
+    });
   }
 
   function read(path:String):Promise<FileResult> {

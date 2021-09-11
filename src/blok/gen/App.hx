@@ -9,7 +9,7 @@ class App extends Component {
       history: HistoryService.from(context).getHistory()
     }, context -> PageRouter.observe(context, router -> {
       AsyncContainer.node({
-        status: switch router.route {
+        status: switch router.route.unwrap() {
           case Ready(result):
             #if blok.platform.static
               blok.gen.ssr.Visitor
@@ -17,7 +17,7 @@ class App extends Component {
                 .addResult(HistoryService.from(context).getLocation(), result);
             #end
             Ready(result.view);
-          case Failed(e): 
+          case Failure(e): 
             Ready(AppService.from(context).renderError(e.message));
           case Loading(promise):
             Loading(promise.next(result -> {

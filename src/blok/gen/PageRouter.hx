@@ -8,14 +8,14 @@ using tink.CoreApi;
 class PageRouter implements State {
   @prop var history:History;
   @prop var routes:RouteContext<PageResult>;
-  @prop var route:AsyncData<PageResult> = None;
+  @prop var route:LoadingResult<PageResult> = LoadingResult.ofNone();
   
   @init
   function setup() {
     addDisposable(history.getObservable().observe(match));
     __props.route = switch routes.match(history.getLocation()) {
       case Some(v): v;
-      case None: None;
+      case None: LoadingResult.ofNone();
     }
   }
 
@@ -28,7 +28,7 @@ class PageRouter implements State {
     return UpdateState({
       route: switch routes.match(url) {
         case Some(v): v;
-        case None: None;
+        case None: LoadingResult.ofNone();
       }
     });
   }

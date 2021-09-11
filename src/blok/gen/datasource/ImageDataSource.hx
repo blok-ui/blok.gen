@@ -21,34 +21,32 @@ typedef ImageEntry = {
   size:ImageSize
 }
 
-// @todo: make more configurable
-@service(fallback = new ImageDataSource(
-  Config.from(context).ssr.source,
-  Path.join([
-    Config.from(context).ssr.destination,
-    Config.from(context).site.assetPath
-  ])
-))
+class ImageDataSourceConfig implements Record {
+  @prop var mediumSize:Int = 900;
+  @prop var thumbSize = 200;
+  @prop var source:String;
+  @prop var destination:String;
+}
+
+@service(fallback = new ImageDataSource({
+  source: Config.from(context).ssr.source,
+  destination: Config.from(context).ssr.destination
+}))
 class ImageDataSource implements Service {
-  static final mediumSize = 900;
-  static final thumbSize = 200;
+  final config:ImageDataSourceConfig;
 
-  final destRoot:String;
-  final sourceRoot:String;
-
-  public function new(destRoot, sourceRoot) {
-    this.destRoot = destRoot;
-    this.sourceRoot = sourceRoot;
+  public function new(props) {
+    config = new ImageDataSourceConfig(props);
   }
 
-  public function list(path:String):AsyncData<Array<String>> {
+  public function list(path:String):Promise<Array<String>> {
     var src = Path.join([ sourceRoot, path ]);
-    if (!FileSystem.exists(src)) return Failed(new Error(404, 'No gallery exists'));
-    return Ready(FileSystem.readDirectory(src).filter(isVaildExtendion));
+    if (!FileSystem.exists(src)) return Promise.reject(new Error(404, 'No gallery exists'));
+    return Promise.resolve(FileSystem.readDirectory(src).filter(isVaildExtendion));
   }
 
-  public function fetch(entries:Array<ImageEntry>):AsyncData<Array<ImageInfo>> {
-    return Loading(Promise.inParallel([ for (e in entries) process(e) ]));
+  public function fetch(entries:Array<ImageEntry>):Promise<Array<ImageInfo>> {
+    return Promise.inParallel([ for (e in entries) process(e) ]);
   }
   
   function isVaildExtendion(src:String) {
@@ -57,11 +55,11 @@ class ImageDataSource implements Service {
 
   function process(entry:ImageEntry):Promise<ImageInfo> {
     var src = Path.join([ 
-      sourceRoot, 
+      config.source, 
       entry.source 
     ]);
     var dest = Path.join([ 
-      destRoot,
+      config.destination,
       entry.name
     ]);
     var dir = dest.directory();
@@ -107,12 +105,12 @@ class ImageDataSource implements Service {
           dest,
           {
             engine: Vips,
-            width: info.width > mediumSize
+            width: info.width > config.mediumSize
               ? info.width
-              : mediumSize,
-            height: info.height > mediumSize
+              : config.mediumSize,
+            height: info.height > config.mediumSize
               ? info.height
-              : mediumSize
+              : config.mediumSize
           }
         ).next(_ -> info);
       case Thumbnail:
@@ -121,8 +119,8 @@ class ImageDataSource implements Service {
           dest,
           {
             engine: Vips,
-            width: thumbSize,
-            height: thumbSize
+            width: config.thumbSize,
+            height: config.thumbSize
           }
         ).next(_ -> info);
       case Custom(x, y):

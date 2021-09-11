@@ -1,6 +1,5 @@
 package example.datasource;
 
-import blok.gen.AsyncData;
 import blok.Service;
 import blok.gen.data.Id;
 import blok.gen.datasource.FormattedFileResult;
@@ -19,13 +18,13 @@ class BlogPostDataSource implements Service {
   public function new() {}
 
   public function getPost(id:Id<BlogPost>) {
-    return base().flatMap(posts -> {
+    return base().next(posts -> {
       var post = posts.find(file -> file.meta.name == id);
       var index = posts.indexOf(post);
       var prev = posts[index - 1];
       var next = posts[index + 1];
       
-      return Ready({
+      return Promise.resolve({
         meta: {
           prev: prev == null ? null : decode(prev),
           next: next == null ? null : decode(next)
@@ -36,17 +35,17 @@ class BlogPostDataSource implements Service {
   }
 
   public function findPosts(first:Int, count:Int) {
-    return base().flatMap(files -> {
+    return base().next(files -> {
       var data = files.slice(first, first + count);
       if (data.length <= 0) {
-        return Failed(new Error(404, 'No data found'));
+        return Promise.reject(new Error(404, 'No data found'));
       }
 
       var startIndex = files.indexOf(data[0]);
       var endIndex = files.indexOf(data[data.length - 1]);
       var posts = data.map(decode);
 
-      return Ready({
+      return Promise.resolve({
         meta: {
           startIndex: startIndex,
           endIndex: endIndex,
@@ -58,10 +57,10 @@ class BlogPostDataSource implements Service {
     });
   }
 
-  function base():AsyncData<Array<FormattedFileResult<{}>>> {
+  function base():Promise<Array<FormattedFileResult<{}>>> {
     return source
       .list('post', path -> path.extension() == 'md')
-      .map(posts -> {
+      .next(posts -> {
         posts.sort((a, b) -> Math.ceil(a.meta.updated.getTime() - b.meta.updated.getTime()));
         posts;
       });

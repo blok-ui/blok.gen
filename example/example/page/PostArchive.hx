@@ -2,7 +2,6 @@ package example.page;
 
 import example.ui.elements.Pagination;
 import blok.gen.Page;
-import blok.gen.AsyncData;
 import blok.gen.MetadataService;
 import example.data.BlogPost;
 import example.ui.layout.DefaultLayout;
@@ -23,7 +22,7 @@ typedef PostArchiveWithPagination = {
 class PostArchive extends Page<PostArchiveWithPagination> {
   static final perPage:Int = 2;
 
-  public function load(page:Int):AsyncData<Dynamic> {
+  public function load(page:Int) {
     return getService(example.datasource.BlogPostDataSource)
       .findPosts(page.toIndex(perPage), perPage);
   }

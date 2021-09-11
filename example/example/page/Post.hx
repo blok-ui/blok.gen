@@ -2,7 +2,6 @@ package example.page;
 
 import example.ui.elements.Container;
 import example.ui.layout.DefaultLayout;
-import blok.gen.AsyncData;
 import blok.gen.Page;
 import blok.gen.MetadataService;
 import example.data.BlogPost;
@@ -18,7 +17,7 @@ typedef PostWithSiblings = {
 }
 
 class Post extends Page<PostWithSiblings> {
-  public function load(id:String):AsyncData<Dynamic> {
+  public function load(id:String) {
     return getService(example.datasource.BlogPostDataSource)
       .getPost(id);
   }
