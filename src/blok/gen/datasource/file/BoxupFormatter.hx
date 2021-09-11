@@ -68,7 +68,7 @@ class BoxupFormatter<T> implements Formatter<T> {
     if (schema != null) return Promise.resolve(schema);
     return schemaSource.get(
       Path.join([ config.schemaPath, id.toString() ]).withExtension('box')
-    ).toPromise().next(file -> {
+    ).next(file -> {
       var compiler = new SchemaCompiler(config.reporter);
       return new Promise((res, rej) -> {
         compiler.compile({

@@ -23,7 +23,7 @@ typedef ImageEntry = {
 
 class ImageDataSourceConfig implements Record {
   @prop var mediumSize:Int = 900;
-  @prop var thumbSize = 200;
+  @prop var thumbSize:Int = 200;
   @prop var source:String;
   @prop var destination:String;
 }
@@ -40,8 +40,8 @@ class ImageDataSource implements Service {
   }
 
   public function list(path:String):Promise<Array<String>> {
-    var src = Path.join([ sourceRoot, path ]);
-    if (!FileSystem.exists(src)) return Promise.reject(new Error(404, 'No gallery exists'));
+    var src = Path.join([ config.source, path ]);
+    if (!FileSystem.exists(src)) return Promise.reject(new Error(404, 'Folder does not exist'));
     return Promise.resolve(FileSystem.readDirectory(src).filter(isVaildExtendion));
   }
 
