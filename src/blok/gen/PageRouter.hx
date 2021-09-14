@@ -1,5 +1,6 @@
 package blok.gen;
 
+import blok.gen.Config;
 import blok.core.foundation.routing.History;
 
 using tink.CoreApi;
@@ -9,6 +10,7 @@ class PageRouter implements State {
   @prop var history:History;
   @prop var routes:RouteContext<PageResult>;
   @prop var route:LoadingResult<PageResult> = LoadingResult.ofNone();
+  @prop var hooks:SiteHooks;
   
   @init
   function setup() {
@@ -27,8 +29,11 @@ class PageRouter implements State {
   public function match(url:String) {
     return UpdateState({
       route: switch routes.match(url) {
-        case Some(v): v;
-        case None: LoadingResult.ofNone();
+        case Some(v):
+          if (hooks.onMatched != null) hooks.onMatched(v);
+          v;
+        case None: 
+          LoadingResult.ofNone();
       }
     });
   }

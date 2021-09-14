@@ -6,6 +6,7 @@ class App extends Component {
   function render() {
     return routes.provide(context -> PageRouter.provide({
       routes: routes,
+      hooks: Config.from(context).hooks,
       history: HistoryService.from(context).getHistory()
     }, context -> PageRouter.observe(context, router -> {
       AsyncContainer.node({

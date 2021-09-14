@@ -15,7 +15,8 @@ class CompiledDataSource implements Service {
   public function preload<T>(path:String):Option<T> {
     var hashed = path.toHashedProperty();
     if (window.hasField(hashed)) {
-      return Some(window.field(hashed));
+      var data = window.field(hashed);
+      return Some(data);
     }
     return None;
   }

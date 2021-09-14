@@ -34,11 +34,13 @@ class AsyncContainer extends Component {
   function render() {
     // Note: this is a bit messy and spaghetti-like. We need to rethink
     // how Suspend works.
-    return AsyncManager.provide({
-      status: Ready
-    }, context -> Suspend.await(
+    //
+    // That, or we can just merge all of this nonsense into the PageRouter.
+    return Context.use(context -> Suspend.await(
       () -> switch status {
         case Ready(vnode):
+          var onLoaded = Config.from(context).hooks.onPageLoaded;
+          if (onLoaded != null) onLoaded();
           previous = vnode;
         case Loading(promise):
           cleanupLink();

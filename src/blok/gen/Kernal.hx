@@ -22,7 +22,8 @@ abstract class Kernal {
     var context = new RouteContext([ 
       config,
       new HistoryService(createHistory()),
-      new MetadataService(config)
+      new MetadataService(config),
+      new AsyncManager({ status: Ready })
     ], routes);
     for (factory in serviceFactories) context.addService(factory(context.getContext()));
     return context;

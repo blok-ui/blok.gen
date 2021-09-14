@@ -22,7 +22,7 @@ class AsyncManager implements State {
     });
   }
 
-  @prop var status:AsyncManagerStatus;
+  @prop public var status:AsyncManagerStatus;
 
   @update
   public function setStatus(status) {

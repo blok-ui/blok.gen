@@ -26,6 +26,7 @@ final config = new Config({
     rootId: 'root',
     assetPath: '/assets'
   }),
+  hooks: new SiteHooks({}),
   #if blok.platform.static
     ssr: new SsrConfig({
       source: Path.join([ Sys.programPath().directory().directory(), 'example/data' ]),

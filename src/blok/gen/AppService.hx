@@ -3,6 +3,9 @@ package blok.gen;
 import blok.gen.ui.DefaultLoadingView;
 import blok.gen.ui.DefaultErrorView;
 
+// Todo: Should all of this just be rolled into Config?
+//       Yes.
+
 @service(fallback = getFallback())
 class AppService implements Record implements Service {
   static var fallback:Null<AppService> = null;
