@@ -1,15 +1,14 @@
 package blok.gen;
 
 import blok.core.foundation.suspend.Suspend;
-import haxe.Timer;
 
 using tink.CoreApi;
 
 enum AsyncContainerStatus {
   Ready(vnode:VNode);
-  Pending(vnode:VNode);
   Loading(promise:Promise<PageResult>);
 }
+
 
 class AsyncContainer extends Component {
   @prop var status:AsyncContainerStatus;
@@ -17,28 +16,7 @@ class AsyncContainer extends Component {
   @prop var loading:()->VNode;
   @prop var error:(e:String)->VNode;
   var previous:Null<VNode>;
-  var timer:Null<Timer>;
   var link:Null<CallbackLink>;
-
-  @before
-  function prepare() {
-    cleanupTimer();
-    switch status {
-      case Loading(_):
-        cleanupLink();
-        timer = Timer.delay(() -> switch __status {
-          case WidgetValid: showLoading();
-          default:
-        }, wait);
-      default:
-    }
-  }
-
-  @dispose
-  function cleanupTimer() {
-    if (timer != null) timer.stop();
-    timer = null;
-  }
 
   @dispose
   function cleanupLink() {
@@ -48,46 +26,39 @@ class AsyncContainer extends Component {
 
   @update
   function setView(vnode:VNode) {
-    cleanupTimer();
-    return UpdateStateSilent({
+    return UpdateState({
       status: Ready(vnode)
     });
   }
 
-  @update
-  function setPendingView(vnode:VNode) {
-    cleanupTimer();
-    return UpdateStateSilent({
-      status: Pending(vnode)
-    });
-  }
-
-  @update 
-  function showLoading() {
-    return UpdateState({
-      status: Pending(loading())
-    });
-  }
-
   function render() {
-    return Suspend.await(
+    // Note: this is a bit messy and spaghetti-like. We need to rethink
+    // how Suspend works.
+    return AsyncManager.provide({
+      status: Ready
+    }, context -> Suspend.await(
       () -> switch status {
-        case Pending(vnode):
-          previous = null;
-          vnode;
         case Ready(vnode):
           previous = vnode;
         case Loading(promise):
+          cleanupLink();
           Suspend.suspend(resume -> {
+            AsyncManager.from(context).setStatus(Loading);
             link = promise.handle(o -> switch o {
               case Success(result):
-                setView(result.view);
+                setView(result.view); 
+                AsyncManager.from(context).setStatus(Ready);
                 resume();
               case Failure(failure):
                 #if blok.platform.static
                   throw failure;
                 #end
-                setPendingView(error(failure.message));
+                if (previous != null) {
+                  setView(previous);
+                  AsyncManager.from(context).setStatus(Failure(failure.message));
+                } else {
+                  setView(error(failure.message));
+                }
                 resume();
             });
           });
@@ -95,6 +66,6 @@ class AsyncContainer extends Component {
       () -> {
         previous == null ? loading() : previous;
       }
-    );
+    ));
   }
 }

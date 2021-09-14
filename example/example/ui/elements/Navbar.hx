@@ -1,8 +1,8 @@
 package example.ui.elements;
 
-import example.page.Home;
-import haxe.io.Path;
 import blok.gen.Config;
+import blok.gen.AsyncManager;
+import example.page.Home;
 
 using Blok;
 
@@ -16,9 +16,15 @@ class Navbar {
   }
 
   public static function brand() {
-    return Config.use(config -> Home.link({
-      className: 'navbar-brand d-flex align-items-center'
-    }, Html.text(config.site.title)));
+    return Config.use(config ->
+      Html.div({
+        className: 'd-flex align-items-center'
+      },
+        Home.link({
+          className: 'navbar-brand'
+        }, Html.text(config.site.title))
+      )
+    );
   }
 
   public static function menu(...children:VNode) {
