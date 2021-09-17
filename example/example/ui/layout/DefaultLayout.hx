@@ -1,6 +1,6 @@
 package example.ui.layout;
 
-import blok.gen.AsyncManager;
+import blok.gen.Hooks;
 import example.ui.elements.Container;
 import example.ui.elements.Navbar;
 import example.page.PostArchive;
@@ -31,18 +31,22 @@ class DefaultLayout extends Component {
           )
         )
       ),
-      // This is a terrible way to display a loading state, but it does
-      // get across how it works:
-      AsyncManager.onLoading(() -> Html.div({
-        className: 'alert alert-info',
-        role: 'status'
-      }, Html.text('Loading...'))),
-      // Errors will appear whenever an async request fails.
-      AsyncManager.onError((message, dismiss) -> Html.div({
-        className: 'alert alert-danger',
-        role: 'alert',
-        onclick: _ -> dismiss(),
-      }, Html.text(message))),
+      Hooks.use(hooks ->
+        hooks.onLoadingStatusChanged.mapToVNode(status -> switch status {
+          case Ready: null;
+          case Failed(message):
+            Html.div({
+              className: 'alert alert-danger',
+              role: 'alert',
+              onclick: _ -> hooks.onLoadingStatusChanged.update(Ready),
+            }, Html.text(message));
+          case Loading: 
+            Html.div({
+              className: 'alert alert-info',
+              role: 'status'
+            }, Html.text('Loading...'));
+        })
+      ),
       Container.main(...children)
     ];
   }

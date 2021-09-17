@@ -1,6 +1,7 @@
 package blok.gen.datasource;
 
 import js.Browser.window;
+import js.Browser.document;
 
 using Reflect;
 using tink.CoreApi;
@@ -13,9 +14,15 @@ class CompiledDataSource implements Service {
   public function new() {}
 
   public function preload<T>(path:String):Option<T> {
+    // Note: ideally we'll be able to remove all of this --
+    //       instead, we'll just use a `<link>` prefetch the data and
+    //       use the HttpDataSource directly. That will have to wait until
+    //       we figure out how to handle async stuff in our hydration though.
     var hashed = path.toHashedProperty();
     if (window.hasField(hashed)) {
       var data = window.field(hashed);
+      window.deleteField(hashed);
+      document.getElementById(hashed).remove();
       return Some(data);
     }
     return None;

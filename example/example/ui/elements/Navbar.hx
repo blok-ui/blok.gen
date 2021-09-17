@@ -1,7 +1,6 @@
 package example.ui.elements;
 
 import blok.gen.Config;
-import blok.gen.AsyncManager;
 import example.page.Home;
 
 using Blok;

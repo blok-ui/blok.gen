@@ -22,10 +22,16 @@ abstract class Page<T> extends Route<PageResult> {
   }
 
   final function createView(data:Dynamic):VNode {
-    var parsed = decode(data);
+    var result = decode(data);
+    var hooks = getService(Hooks);
+    
+    hooks.onPageLoaded.update(this);
+
     return MetadataService.use(meta -> {
-      metadata(parsed, meta);
-      render(parsed);
+      metadata(result, meta);
+      var vnode = render(result);
+      hooks.onPageRendered.update(this);
+      vnode;
     });
   }
 }
