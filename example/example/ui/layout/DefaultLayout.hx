@@ -1,6 +1,6 @@
 package example.ui.layout;
 
-import blok.gen.Hooks;
+import blok.gen.HookService;
 import example.ui.elements.Container;
 import example.ui.elements.Navbar;
 import example.page.PostArchive;
@@ -31,7 +31,7 @@ class DefaultLayout extends Component {
           )
         )
       ),
-      Hooks.use(hooks ->
+      HookService.use(hooks ->
         hooks.onLoadingStatusChanged.mapToVNode(status -> switch status {
           case Ready: null;
           case Failed(message):

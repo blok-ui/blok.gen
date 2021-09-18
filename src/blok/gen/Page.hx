@@ -23,7 +23,7 @@ abstract class Page<T> extends Route<PageResult> {
 
   final function createView(data:Dynamic):VNode {
     var result = decode(data);
-    var hooks = getService(Hooks);
+    var hooks = getService(HookService);
     
     hooks.onPageLoaded.update(this);
 

@@ -136,6 +136,7 @@ class Visitor implements Service {
 <html>
   <head>
     <title>${meta.getPageTitle()}</title>
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1">
     ${head.join('\n    ')}
   </head>
@@ -150,7 +151,7 @@ class Visitor implements Service {
     ])}"></script>
   </body>
 </html>
-    '.trim();
+    '.trim().replace('\r\n', '\n');
 
     return {
       htmlPath: htmlPath,

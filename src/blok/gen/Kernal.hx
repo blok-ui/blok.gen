@@ -23,7 +23,7 @@ abstract class Kernal {
       config,
       new HistoryService(createHistory()),
       new MetadataService(config),
-      new Hooks()
+      new HookService()
     ], routes);
     for (factory in serviceFactories) context.addService(factory(context.getContext()));
     return context;
