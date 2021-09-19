@@ -1,6 +1,5 @@
 package blok.gen;
 
-import blok.gen.Config;
 import blok.core.foundation.routing.History;
 
 using tink.CoreApi;

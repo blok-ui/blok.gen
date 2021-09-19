@@ -27,12 +27,18 @@ class HookService implements Service {
   /**
     Triggers after a page has loaded, but *before* it has rendered.
   **/
-  public final onPageLoaded:Observable<Null<Page<Dynamic>>> = new Observable(null);
+  public final onPageLoaded:Observable<Null<{
+    page:Page<Dynamic>,
+    data:Dynamic
+  }>> = new Observable(null);
   
   /**
     Triggers after a page has rendered.
   **/
-  public final onPageRendered:Observable<Null<Page<Dynamic>>> = new Observable(null);
+  public final onPageRendered:Observable<Null<{
+    page:Page<Dynamic>,
+    view:VNode
+  }>> = new Observable(null);
 
   public function new() {}
 }

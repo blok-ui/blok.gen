@@ -2,6 +2,8 @@ package blok.gen;
 
 import blok.VNode;
 
+using blok.Effect;
+
 @:autoBuild(blok.gen.PageBuilder.build())
 abstract class Page<T> extends Route<PageResult> {
   abstract public function decode(data:Dynamic):T;
@@ -25,13 +27,18 @@ abstract class Page<T> extends Route<PageResult> {
     var result = decode(data);
     var hooks = getService(HookService);
     
-    hooks.onPageLoaded.update(this);
+    hooks.onPageLoaded.update({
+      page: this,
+      data: data
+    });
 
     return MetadataService.use(meta -> {
       metadata(result, meta);
       var vnode = render(result);
-      hooks.onPageRendered.update(this);
-      vnode;
+      vnode.withEffect(() -> hooks.onPageRendered.update({
+        page: this,
+        view: vnode
+      }));
     });
   }
 }

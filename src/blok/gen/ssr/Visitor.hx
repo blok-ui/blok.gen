@@ -113,6 +113,9 @@ class Visitor implements Service {
       case AssetCss(path, local):
         if (local) path = Path.join([ config.site.url, config.site.assetPath, path ]);
         '<link rel="stylesheet" href="${path.withExtension('css')}"/>';
+      case AssetPreload(path, local):
+        if (local) path = Path.join([ config.site.url, path ]);
+        '<link as="fetch" rel="preload" href="${path}"/>';
       case AssetJs(_, _):
         null;
     } ].filter(s -> s != null);
