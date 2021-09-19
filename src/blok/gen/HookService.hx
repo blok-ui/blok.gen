@@ -37,7 +37,7 @@ class HookService implements Service {
   **/
   public final onPageRendered:Observable<Null<{
     page:Page<Dynamic>,
-    view:VNode
+    widget:Widget
   }>> = new Observable(null);
 
   public function new() {}

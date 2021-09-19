@@ -1,19 +1,12 @@
 package blok.gen.ssr;
 
 import tink.CoreApi.Promise;
-import blok.core.foundation.suspend.SuspendTracker;
 import blok.core.foundation.routing.history.StaticHistory;
 
 using haxe.io.Path;
 
 class SsrKernal extends Kernal {
   final hooks:Array<()->Void> = [];
-
-  override function createRouteContext():RouteContext<PageResult> {
-    var context = super.createRouteContext();
-    context.addService(new SuspendTracker());
-    return context;
-  }
 
   public function createHistory() {
     return new StaticHistory('/');
@@ -24,7 +17,7 @@ class SsrKernal extends Kernal {
   }
   
   public function run() {
-    var visitor = new Visitor(this);
+    var visitor = new Visitor2(this);
     var writer = new FileWriter(config.ssr.destination);
 
     Sys.println('');
@@ -34,10 +27,7 @@ class SsrKernal extends Kernal {
     visitor.visit('/');
     visitor.run().handle(o -> switch o {
       case Success(data): Promise.inParallel(data.map(result -> {
-        Promise.inParallel([
-          writer.write(result.jsonPath, result.json),
-          writer.write(result.htmlPath, result.html)
-        ]);
+        writer.write(result.path, result.contents);
       })).handle(o -> switch o {
         case Success(_):
           if (hooks.length > 0) {

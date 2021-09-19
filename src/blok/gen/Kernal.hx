@@ -21,6 +21,7 @@ abstract class Kernal {
   public function createRouteContext() {
     var context = new RouteContext([ 
       config,
+      new Suspend(),
       new HistoryService(createHistory()),
       new MetadataService(config),
       new HookService()

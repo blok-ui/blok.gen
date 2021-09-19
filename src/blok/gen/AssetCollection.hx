@@ -21,4 +21,12 @@ abstract AssetCollection(Array<AssetType>) from Array<AssetType> {
   public function addExternalJs(path:String) {
     this.push(AssetJs(path, false));
   }
+  
+  public function addLocalPreload(path:String) {
+    this.push(AssetPreload(path, true));
+  }
+
+  public function addExternalPreload(path:String) {
+    this.push(AssetPreload(path, false));
+  }
 }

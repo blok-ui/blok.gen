@@ -9,7 +9,7 @@ class PageLink extends Component {
   @use var router:PageRouter;
   @use var config:Config;
   #if blok.platform.static
-    @use var visitor:blok.gen.ssr.Visitor;
+    @use var visitor:blok.gen.ssr.Visitor2;
   #end
   
   #if blok.platform.static

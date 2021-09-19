@@ -25,20 +25,13 @@ abstract class Page<T> extends Route<PageResult> {
 
   final function createView(data:Dynamic):VNode {
     var result = decode(data);
-    var hooks = getService(HookService);
-    
-    hooks.onPageLoaded.update({
-      page: this,
-      data: data
-    });
-
     return MetadataService.use(meta -> {
       metadata(result, meta);
-      var vnode = render(result);
-      vnode.withEffect(() -> hooks.onPageRendered.update({
+      PageLifecycle.node({
         page: this,
-        view: vnode
-      }));
+        data: data,
+        child: render(result)
+      });
     });
   }
 }

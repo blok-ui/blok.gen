@@ -1,7 +1,5 @@
 package blok.gen;
 
-import blok.core.foundation.suspend.Suspend;
-
 using tink.CoreApi;
 
 enum AsyncContainerStatus {
