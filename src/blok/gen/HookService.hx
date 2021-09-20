@@ -16,6 +16,9 @@ enum LoadingStatus {
 **/
 @service(fallback = new HookService())
 class HookService implements Service {
+  public static var uid:Int = 1;
+  public final id = uid++;
+
   /**
     Updates whenever an asyncronous request is made.
 
@@ -25,20 +28,24 @@ class HookService implements Service {
   public final onLoadingStatusChanged:Observable<LoadingStatus> = new Observable(Ready);
 
   /**
+    Updates whenever data is loaded. Generally this is handled automatically
+    by the Page, but you can call it yourself if you want to add content.
+  **/
+  public final onDataReceived:Observable<Dynamic> = new Observable(
+    null,
+    // Always update.
+    (a, b) -> true
+  );
+
+  /**
     Triggers after a page has loaded, but *before* it has rendered.
   **/
-  public final onPageLoaded:Observable<Null<{
-    page:Page<Dynamic>,
-    data:Dynamic
-  }>> = new Observable(null);
-  
+  public final onPageLoaded:Observable<Null<Page<Dynamic>>> = new Observable(null);
+
   /**
     Triggers after a page has rendered.
   **/
-  public final onPageRendered:Observable<Null<{
-    page:Page<Dynamic>,
-    widget:Widget
-  }>> = new Observable(null);
+  public final onPageRendered:Observable<Null<Page<Dynamic>>> = new Observable(null);
 
   public function new() {}
 }

@@ -21,10 +21,10 @@ abstract class Kernal {
   public function createRouteContext() {
     var context = new RouteContext([ 
       config,
+      new HookService(),
       new Suspend(),
       new HistoryService(createHistory()),
-      new MetadataService(config),
-      new HookService()
+      new MetadataService(config)
     ], routes);
     for (factory in serviceFactories) context.addService(factory(context.getContext()));
     return context;

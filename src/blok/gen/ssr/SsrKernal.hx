@@ -17,7 +17,7 @@ class SsrKernal extends Kernal {
   }
   
   public function run() {
-    var visitor = new Visitor2(this);
+    var visitor = new Visitor(this);
     var writer = new FileWriter(config.ssr.destination);
 
     Sys.println('');

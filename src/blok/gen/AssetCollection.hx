@@ -1,6 +1,6 @@
 package blok.gen;
 
-@:forward(iterator)
+@:forward(iterator, copy)
 abstract AssetCollection(Array<AssetType>) from Array<AssetType> {
   public function new(assets) {
     this = assets;

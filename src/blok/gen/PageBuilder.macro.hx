@@ -182,10 +182,14 @@ class PageBuilder {
                     view: createView(data)
                   }));
                 case Loading(promise):
-                  Some(blok.gen.LoadingResult.ofPromise(promise.next(data -> {
-                    data: data,
-                    view: createView(data)
-                  })));
+                  Some(blok.gen.LoadingResult
+                      .ofPromise(promise
+                        .next(data -> {
+                          data: data,
+                          view: createView(data)
+                        })
+                      )
+                    );
                 case Failure(error):
                   Some(blok.gen.LoadingResult.ofError(error));
                 case None:

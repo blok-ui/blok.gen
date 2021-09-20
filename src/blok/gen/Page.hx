@@ -6,6 +6,8 @@ using blok.Effect;
 
 @:autoBuild(blok.gen.PageBuilder.build())
 abstract class Page<T> extends Route<PageResult> {
+  var context:Null<Context> = null;
+
   abstract public function decode(data:Dynamic):T;
   abstract public function render(data:T):VNode;
   abstract public function metadata(data:T, meta:MetadataService):Void;
@@ -16,8 +18,8 @@ abstract class Page<T> extends Route<PageResult> {
 
   public function getContext():Context {
     return switch findParentOfType(RouteContext) {
-      case Some(context): 
-        context.getContext();
+      case Some(routeContext): 
+        context = routeContext.getContext();
       case None:
         throw 'Could not find route context';
     }
@@ -25,12 +27,13 @@ abstract class Page<T> extends Route<PageResult> {
 
   final function createView(data:Dynamic):VNode {
     var result = decode(data);
-    return MetadataService.use(meta -> {
-      metadata(result, meta);
-      PageLifecycle.node({
-        page: this,
-        data: data,
-        child: render(result)
+    return HookService.use(hooks -> {
+      hooks.onDataReceived.update(data);
+      hooks.onPageLoaded.update(this);
+      MetadataService.use(meta -> {
+        metadata(result, meta);
+        render(result)
+          .withEffect(() -> hooks.onPageRendered.update(this));
       });
     });
   }
