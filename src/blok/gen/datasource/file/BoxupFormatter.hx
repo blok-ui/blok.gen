@@ -43,13 +43,19 @@ class BoxupFormatter<T> implements Formatter<T> {
                 case Success(schema): 
                   compile(schema, nodes)
                     .handleValue(res)
-                    .handleError(e -> config.reporter.report(e, source))
-                    .handleError(e -> rej(new Error(500, 'Could not compile boxup:' + e.message)));
+                    .handleError(e -> {
+                      config.reporter.report(e, source);
+                      rej(new Error(500, 'Could not compile boxup: ' + e.message));
+                    });
                 case Failure(e):
                   rej(e);
               });
             })
             .handleError(e -> rej(new Error(500, e.message)));
+        })
+        .handleError(e -> {
+          config.reporter.report(e, source);
+          rej(new Error(500, 'Could not compile boxup: ' + e.message));
         });
 
       () -> null;

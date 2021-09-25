@@ -21,7 +21,8 @@ class ClientKernal extends Kernal {
   public function run() {
     Platform.hydrate(
       Browser.document.getElementById(config.site.rootId),
-      createApp(createRouteContext())
+      createApp(createRouteContext()),
+      root -> null
     );
   }
 }

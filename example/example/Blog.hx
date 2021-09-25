@@ -1,10 +1,10 @@
 package example;
 
 import blok.gen.AppService;
-import blok.gen.PageResult;
-import blok.gen.Route;
 import blok.gen.Config;
+import blok.gen.RouteFactory;
 import blok.gen.ServiceFactory;
+import example.data.BlogConfig;
 import example.page.*;
 import example.ui.status.ErrorView;
 import example.ui.status.LoadingView;
@@ -34,13 +34,14 @@ final config = new Config({
   #end
 });
 
-final routes:Array<Route<PageResult>> = [
-  new Home(),
-  new Post(),
-  new PostArchive()
+final routes:Array<RouteFactory> = [
+  ctx -> new Home(),
+  ctx -> new Post(),
+  ctx -> new PostArchive(BlogConfig.from(ctx).perPage)
 ];
 
 final services:Array<ServiceFactory> = [
+  ctx -> new BlogConfig({ perPage: 2 }),
   ctx -> new AppService({
     loadingView: LoadingView.node,
     errorView: ErrorView.node,

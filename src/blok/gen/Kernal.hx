@@ -4,12 +4,12 @@ import blok.core.foundation.routing.History;
 
 abstract class Kernal {
   final config:Config;
-  final routes:Array<Route<PageResult>>;
+  final routeFactories:Array<RouteFactory>;
   final serviceFactories:Array<ServiceFactory>;
 
-  public function new(config, routes, ?serviceFactories) {
+  public function new(config, routeFactories, ?serviceFactories) {
     this.config = config;
-    this.routes = routes;
+    this.routeFactories = routeFactories;
     this.serviceFactories = serviceFactories == null ? [] : serviceFactories;
   }
 
@@ -24,9 +24,14 @@ abstract class Kernal {
       new HookService(),
       new Suspend(),
       new HistoryService(createHistory()),
-      new MetadataService(config)
-    ], routes);
-    for (factory in serviceFactories) context.addService(factory(context.getContext()));
+      new MetadataService()
+    ], []);
+    for (factory in serviceFactories) {
+      context.addService(factory(context.getContext()));
+    }
+    for (factory in routeFactories) {
+      context.addChild(factory(context.getContext()));
+    }
     return context;
   }
 

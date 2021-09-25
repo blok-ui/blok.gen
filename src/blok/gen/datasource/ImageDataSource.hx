@@ -99,18 +99,15 @@ class ImageDataSource implements Service {
       case Full: 
         src.copy(dest);
         info;
-      case Medium: 
+      case Medium:
+        trace(info.width);
         Image.resize(
           src,
           dest,
           {
             engine: Vips,
-            width: info.width > config.mediumSize
-              ? info.width
-              : config.mediumSize,
-            height: info.height > config.mediumSize
-              ? info.height
-              : config.mediumSize
+            width: config.mediumSize,
+            height: config.mediumSize
           }
         ).next(_ -> info);
       case Thumbnail:

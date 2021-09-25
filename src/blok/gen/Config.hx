@@ -12,11 +12,9 @@ class Config implements Service implements Record {
 class SiteConfig implements Record {
   @prop var url:String;
   @prop var title:String;
+  @prop var appName:String = 'app';
   @prop var rootId:String = 'root';
   @prop var assetPath:String = '/assets';
-  // @prop var assets:AssetCollection = new AssetCollection([]);
-  // @prop var loadingView:(props:{}, ?key:Key)->VNode;
-  // @prop var errorView:(props:{ message:String }, ?key:Key)->VNode;
 }
 
 #if blok.platform.static

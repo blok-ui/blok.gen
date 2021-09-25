@@ -20,7 +20,12 @@ typedef PostArchiveWithPagination = {
 
 @page(route = 'post-archive')
 class PostArchive extends Page<PostArchiveWithPagination> {
-  static final perPage:Int = 2;
+  final perPage:Int;
+
+  public function new(perPage) {
+    super();
+    this.perPage = perPage;
+  }
 
   public function load(page:Int) {
     return getService(example.datasource.BlogPostDataSource)
