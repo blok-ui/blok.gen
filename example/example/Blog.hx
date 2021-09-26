@@ -4,6 +4,7 @@ import blok.gen.AppService;
 import blok.gen.Config;
 import blok.gen.RouteFactory;
 import blok.gen.ServiceFactory;
+import blok.gen.data.ContentRenderer;
 import example.data.BlogConfig;
 import example.page.*;
 import example.ui.status.ErrorView;
@@ -42,6 +43,7 @@ final routes:Array<RouteFactory> = [
 
 final services:Array<ServiceFactory> = [
   ctx -> new BlogConfig({ perPage: 2 }),
+  ctx -> ContentRenderer.withDefaults(),
   ctx -> new AppService({
     loadingView: LoadingView.node,
     errorView: ErrorView.node,

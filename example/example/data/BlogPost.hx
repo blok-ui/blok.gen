@@ -10,6 +10,5 @@ using tink.CoreApi;
 class BlogPost implements Record {
   @constant var id:Id<BlogPost>;
   @prop var title:String;
-  @prop var content:Content;
+  @prop var content:Array<Content>;
 }
-

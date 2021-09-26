@@ -1,9 +1,10 @@
 package example.page;
 
-import example.ui.elements.Container;
-import example.ui.layout.DefaultLayout;
 import blok.gen.Page;
 import blok.gen.MetadataService;
+import blok.gen.data.ContentRenderer;
+import example.ui.elements.Container;
+import example.ui.layout.DefaultLayout;
 import example.data.BlogPost;
 
 using Blok;
@@ -41,7 +42,7 @@ class Post extends Page<PostWithSiblings> {
         Container.section(
           Container.header({ title: posts.current.title }),
           Container.row(  
-            Container.column({}, posts.current.content)
+            Container.column({}, ContentRenderer.renderContent(posts.current.content))
           ),
           Container.row(
             Container.column({},

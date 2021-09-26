@@ -2,6 +2,7 @@ package example.datasource;
 
 import blok.Service;
 import blok.gen.data.Id;
+import blok.gen.data.ContentGenerator;
 import blok.gen.datasource.FormattedFileResult;
 import blok.gen.datasource.FormattedDataSource;
 import example.data.BlogPost;
@@ -70,7 +71,7 @@ class BlogPostDataSource implements Service {
     return new BlogPost({
       id: file.meta.name,
       title: (file.formatted.field('data'):{}).field('title'),
-      content: (file.formatted.field('content'):String)
+      content: ContentGenerator.ofString(file.formatted.field('content'))
     }).toJson();
   }
 }
