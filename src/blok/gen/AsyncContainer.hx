@@ -24,16 +24,11 @@ class AsyncContainer extends Component {
 
   @update
   function setView(vnode:VNode) {
-    return UpdateState({
-      status: Ready(vnode)
-    });
+    return { status: Ready(vnode) };
   }
 
   function render() {
-    // Note: this is a bit messy and spaghetti-like. We need to rethink
-    // how Suspend works.
-    //
-    // That, or we can just merge all of this nonsense into the PageRouter.
+    // Todo: replace all with with SuspendableData<Page>.
     return Context.use(context -> Suspend.await(
       () -> switch status {
         case Ready(vnode):

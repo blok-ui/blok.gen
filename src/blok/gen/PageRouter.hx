@@ -21,13 +21,13 @@ class PageRouter implements State {
 
   @update
   public function match(url:String) {
-    return UpdateState({
+    return {
       route: switch routes.match(url) {
         case Some(result):
           result;
         case None: 
           LoadingResult.ofNone();
       }
-    });
+    };
   }
 }
