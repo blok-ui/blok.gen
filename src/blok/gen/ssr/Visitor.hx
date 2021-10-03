@@ -88,21 +88,21 @@ class Visitor implements Service {
           Sys.println(' ◧ Waiting on $name');
           Pending;
         case Complete:
-          hooks.onDataReceived.handle(value -> {
-            if (value == null) {
+          hooks.page.handle(status -> switch status {
+            case PageReady(_, value, _):
+              var data = haxe.Json.stringify(value #if debug , '  ' #end);
+              Sys.println(' ■ Completed: $name');
+              res([
+                process(url, app, meta, config, data, cast root.toConcrete()),
+                ({
+                  path: generateJsonPath(url),
+                  contents: data
+                }:VisitorResult)
+              ]);
+              Handled;
+            default:
               Sys.println(' ◧ Waiting on data for $name');
-              return Pending;
-            }
-            var data = haxe.Json.stringify(value #if debug , '  ' #end);
-            Sys.println(' ■ Completed: $name');
-            res([
-              process(url, app, meta, config, data, cast root.toConcrete()),
-              ({
-                path: generateJsonPath(url),
-                contents: data
-              }:VisitorResult)
-            ]);
-            Handled;
+              Pending;
           });
           Handled;
       });

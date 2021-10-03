@@ -32,15 +32,15 @@ class DefaultLayout extends Component {
         )
       ),
       HookService.use(hooks ->
-        hooks.onLoadingStatusChanged.mapToVNode(status -> switch status {
-          case Ready: null;
-          case Failed(message):
+        hooks.site.mapToVNode(status -> switch status {
+          case NoSite | SiteReady: null;
+          case SiteLoadingFailed(error):
             Html.div({
               className: 'alert alert-danger',
               role: 'alert',
-              onclick: _ -> hooks.onLoadingStatusChanged.update(Ready),
-            }, Html.text(message));
-          case Loading: 
+              onclick: _ -> hooks.site.update(SiteReady),
+            }, Html.text(error.message));
+          case SiteLoading: 
             Html.div({
               className: 'alert alert-info',
               role: 'status'

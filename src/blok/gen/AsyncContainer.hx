@@ -36,11 +36,11 @@ class AsyncContainer extends Component {
         case Loading(promise):
           cleanupLink();
           Suspend.suspend(resume -> {
-            HookService.from(context).onLoadingStatusChanged.update(Loading);
+            HookService.from(context).site.update(SiteLoading);
             link = promise.handle(o -> switch o {
               case Success(result):
                 setView(result.view); 
-                HookService.from(context).onLoadingStatusChanged.update(Ready);
+                HookService.from(context).site.update(SiteReady);
                 resume();
               case Failure(failure):
                 #if blok.platform.static
@@ -48,7 +48,7 @@ class AsyncContainer extends Component {
                 #end
                 if (previous != null) {
                   setView(previous);
-                  HookService.from(context).onLoadingStatusChanged.update(Failed(failure.message));
+                  HookService.from(context).site.update(SiteLoadingFailed(failure));
                 } else {
                   setView(error(failure.message));
                 }

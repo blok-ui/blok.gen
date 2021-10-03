@@ -173,14 +173,14 @@ class PageBuilder {
                 case Ready(data):
                   Some(blok.gen.LoadingResult.ofData({
                     data: data,
-                    view: createView(data)
+                    view: createView(url, data)
                   }));
                 case Loading(promise):
                   Some(blok.gen.LoadingResult
                       .ofPromise(promise
                         .next(data -> {
                           data: data,
-                          view: createView(data)
+                          view: createView(url, data)
                         })
                       )
                     );

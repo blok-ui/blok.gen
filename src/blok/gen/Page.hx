@@ -25,15 +25,16 @@ abstract class Page<T> extends Route<PageResult> {
     }
   }
 
-  final function createView(data:Dynamic):VNode {
+  final function createView(url:String, data:Dynamic):VNode {
     var result = decode(data);
     return HookService.use(hooks -> {
-      hooks.onDataReceived.update(data);
-      hooks.onPageLoaded.update(this);
+      hooks.page.update(PageLoading(url));
+      // hooks.onDataReceived.update(data);
+      // hooks.onPageLoaded.update(this);
       MetadataService.use(meta -> {
         metadata(result, meta);
         render(result)
-          .withEffect(() -> hooks.onPageRendered.update(this));
+          .withEffect(() -> hooks.page.update(PageReady(url, data, this)));
       });
     });
   }
