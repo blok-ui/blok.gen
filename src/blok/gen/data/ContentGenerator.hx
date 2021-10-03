@@ -48,7 +48,10 @@ class ContentGenerator {
         var block = schema.getBlock(type);
         var tag = block.getMeta('html.tag');
         var props = new DynamicAccess();
-        var children = node.children.filter(node -> !node.type.equals(Property));
+        var children = node.children.filter(node -> switch node.type {
+          case Block(_, _) | Paragraph | Text: true;
+          default: false;
+        });
 
         for (prop in block.properties) {
           props.set(prop.name, node.getProperty(prop.name));
@@ -84,8 +87,6 @@ class ContentGenerator {
           type: '@text',
           data: node.textContent
         });
-      case Meta(_):
-        null;
       default:
         throw 'Unknown type';
     }
