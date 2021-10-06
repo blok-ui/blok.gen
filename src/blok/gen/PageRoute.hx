@@ -1,16 +1,18 @@
 package blok.gen;
 
-import blok.VNode;
-
+using tink.CoreApi;
 using blok.Effect;
 
-@:autoBuild(blok.gen.PageBuilder.build())
-abstract class Page<T> extends Route<PageResult> {
+@:autoBuild(blok.gen.PageRouteBuilder.build())
+abstract class PageRoute<T> extends Route<PageResult> {
   var context:Null<Context> = null;
 
   abstract public function decode(data:Dynamic):T;
   abstract public function render(data:T):VNode;
-  abstract public function metadata(data:T, meta:MetadataService):Void;
+
+  public function renderError(e:Error):VNode {
+    return Config.use(config -> config.view.error(e));
+  }
 
   public inline function getService<T:ServiceProvider>(resolver:ServiceResolver<T>):T {
     return getContext().getService(resolver);
@@ -25,17 +27,17 @@ abstract class Page<T> extends Route<PageResult> {
     }
   }
 
-  final function createView(url:String, data:Dynamic):VNode {
-    var result = decode(data);
+  final function createErrorView(url:String, e:Error) {
     return HookService.use(hooks -> {
-      hooks.page.update(PageLoading(url));
-      // hooks.onDataReceived.update(data);
-      // hooks.onPageLoaded.update(this);
-      MetadataService.use(meta -> {
-        metadata(result, meta);
-        render(result)
-          .withEffect(() -> hooks.page.update(PageReady(url, data, this)));
-      });
+      renderError(e)
+        .withEffect(() -> hooks.page.update(PageFailed(url, e, this)));
     });
   }
+
+  final function createView(url:String, data:Dynamic) {
+    return HookService.use(hooks -> {
+      render(decode(data))
+        .withEffect(() -> hooks.page.update(PageReady(url, data, this)));
+    });
+  } 
 }

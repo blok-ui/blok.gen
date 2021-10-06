@@ -1,15 +1,14 @@
 package example.page;
 
 import example.ui.elements.Pagination;
-import blok.gen.Page;
-import blok.gen.MetadataService;
 import example.data.BlogPost;
 import example.ui.layout.DefaultLayout;
 import example.ui.elements.Container;
 
 using Reflect;
 using Blok;
-using blok.gen.tools.PaginationTools;
+using blok.GenApi;
+using blok.gen.data.PaginationTools;
 
 typedef PostArchiveWithPagination = {
   public final page:Int;
@@ -19,7 +18,7 @@ typedef PostArchiveWithPagination = {
 }
 
 @page(route = 'post-archive')
-class PostArchive extends Page<PostArchiveWithPagination> {
+class PostArchive extends PageRoute<PostArchiveWithPagination> {
   final perPage:Int;
 
   public function new(perPage) {
@@ -29,7 +28,8 @@ class PostArchive extends Page<PostArchiveWithPagination> {
 
   public function load(page:Int) {
     return getService(example.datasource.BlogPostDataSource)
-      .findPosts(page.toIndex(perPage), perPage);
+      .findPosts(page.toIndex(perPage), perPage)
+      .toObservableResult();
   }
 
   public function decode(data:Dynamic):PostArchiveWithPagination {
@@ -40,10 +40,6 @@ class PostArchive extends Page<PostArchiveWithPagination> {
       totalPages: meta.total.paginate(perPage),
       posts: (data.field('data'):Array<Dynamic>).map(BlogPost.new)
     };
-  }
-
-  public function metadata(data:PostArchiveWithPagination, meta:MetadataService) {
-    meta.setPageTitle('Post Archives'); 
   }
   
   public function render(data:PostArchiveWithPagination) {
@@ -78,6 +74,7 @@ class PostArchive extends Page<PostArchiveWithPagination> {
     }
 
     return DefaultLayout.node({ 
+      pageTitle: 'Post Archives',
       children: [
         Container.section(
           Container.header({ title: 'Archives' }),

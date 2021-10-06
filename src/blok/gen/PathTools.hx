@@ -1,8 +1,7 @@
-package blok.gen.tools;
+package blok.gen;
 
 using StringTools;
 using haxe.io.Path;
-using blok.tools.ObjectTools;
 
 class PathTools {
   public static function nameToPath(name:String) {
@@ -22,10 +21,5 @@ class PathTools {
     var normalized = url.normalize();
     if (normalized.startsWith('/')) normalized = normalized.substr(1);
     return normalized;
-  }
-
-  public static function toHashedProperty(url:String) {
-    var normalized = prepareUrl(url);
-    return '__blok_gen_${normalized.hash()}';
   }
 }

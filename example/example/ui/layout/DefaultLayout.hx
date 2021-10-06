@@ -1,25 +1,25 @@
 package example.ui.layout;
 
+import blok.gen.Config;
+import blok.gen.Head;
 import blok.gen.HookService;
 import example.ui.elements.Container;
 import example.ui.elements.Navbar;
 import example.page.PostArchive;
 
-using Nuke;
 using Blok;
 
 class DefaultLayout extends Component {
-  @:keep static final global = Css.global({
-    body: {
-      fontFamily: 'sans-serif',
-      fontSize: 13.px()
-    }
-  });
-
+  @prop var pageTitle:String;
   @prop var children:Array<VNode>;
+  @use var config:Config;
 
   function render() {
     return [
+      Head.node({
+        siteTitle: config.site.title,
+        pageTitle: pageTitle
+      }),
       Navbar.container( 
         Navbar.brand(),
         Navbar.menu( 
@@ -32,15 +32,15 @@ class DefaultLayout extends Component {
         )
       ),
       HookService.use(hooks ->
-        hooks.site.mapToVNode(status -> switch status {
-          case NoSite | SiteReady: null;
-          case SiteLoadingFailed(error):
+        hooks.page.mapToVNode(status -> switch status {
+          case NoPage | PageReady(_, _, _): null;
+          case PageFailed(url, error, _):
             Html.div({
               className: 'alert alert-danger',
               role: 'alert',
-              onclick: _ -> hooks.site.update(SiteReady),
-            }, Html.text(error.message));
-          case SiteLoading: 
+              onclick: _ -> hooks.page.update(NoPage),
+            }, Html.text('Failed to load: $url'),  Html.text(error.message));
+          case PageLoading(_): 
             Html.div({
               className: 'alert alert-info',
               role: 'status'

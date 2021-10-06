@@ -1,4 +1,4 @@
-package blok.gen.tools;
+package blok.gen.data;
 
 // This is probably a horrible way to do this :V
 class PaginationTools {  

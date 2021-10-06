@@ -1,8 +1,5 @@
 package blok.gen;
 
-import blok.VNode;
+using tink.CoreApi;
 
-typedef PageResult = {
-  public final data:Dynamic;
-  public final view:VNode;
-}
+typedef PageResult = ObservableResult<VNode, Error>;

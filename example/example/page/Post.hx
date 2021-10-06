@@ -1,13 +1,12 @@
 package example.page;
 
-import blok.gen.Page;
-import blok.gen.MetadataService;
 import blok.gen.data.ContentRenderer;
 import example.ui.elements.Container;
 import example.ui.layout.DefaultLayout;
 import example.data.BlogPost;
 
 using Blok;
+using blok.GenApi;
 using Reflect;
 using tink.CoreApi;
 
@@ -17,10 +16,11 @@ typedef PostWithSiblings = {
   public final current:BlogPost;
 }
 
-class Post extends Page<PostWithSiblings> {
+class Post extends PageRoute<PostWithSiblings> {
   public function load(id:String) {
     return getService(example.datasource.BlogPostDataSource)
-      .getPost(id);
+      .getPost(id)
+      .toObservableResult();
   }
 
   public function decode(data:Dynamic):PostWithSiblings {
@@ -31,13 +31,10 @@ class Post extends Page<PostWithSiblings> {
       current: new BlogPost(data.field('data'))
     };
   }
-
-  public function metadata(data:PostWithSiblings, meta:MetadataService) {
-    meta.setPageTitle('Post | ' + data.current.title);
-  }
   
   public function render(posts:PostWithSiblings) {
     return DefaultLayout.node({
+      pageTitle: 'Post | ' + posts.current.title,
       children: [
         Container.section(
           Container.header({ title: posts.current.title }),

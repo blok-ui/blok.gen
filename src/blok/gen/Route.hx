@@ -29,7 +29,7 @@ class Route<T> {
     children.push(route);
   }
 
-  public function match(url:String):Option<LoadingResult<T>> {
+  public function match(url:String):Option<T> {
     if (children.length > 0) for (route in children) switch route.match(url) {
       case Some(result): return Some(result);
       case None:

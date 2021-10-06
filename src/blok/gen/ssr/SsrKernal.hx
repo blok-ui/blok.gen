@@ -1,23 +1,15 @@
 package blok.gen.ssr;
 
-import tink.CoreApi.Promise;
-import blok.core.foundation.routing.history.StaticHistory;
-
-using haxe.io.Path;
+using tink.CoreApi;
 
 class SsrKernal extends Kernal {
-  final hooks:Array<()->Void> = [];
-
-  public function createHistory() {
-    return new StaticHistory('/');
+  function getModules():Array<Module<PageResult>> {
+    return [ new SsrModule() ];
   }
 
-  public function onAfterGenerate(hook) {
-    hooks.push(hook);
-  }
-  
   public function run() {
     var visitor = new Visitor(this);
+    var config = site.getConfig();
     var writer = new FileWriter(config.ssr.destination);
 
     Sys.println('');
@@ -30,10 +22,6 @@ class SsrKernal extends Kernal {
         writer.write(result.path, result.contents);
       })).handle(o -> switch o {
         case Success(_):
-          if (hooks.length > 0) {
-            for (hook in hooks) hook();
-          }
-
           Sys.println('');
           Sys.println('Build completed with no errors.');
           Sys.exit(0);

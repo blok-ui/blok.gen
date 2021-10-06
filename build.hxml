@@ -1,7 +1,6 @@
 -cp src
 -cp example
 
--lib nuke
 -lib tink_core
 -lib blok.core.foundation
 
@@ -16,8 +15,6 @@
 -lib blok.platform.dom
 
 -main Client
-
--D nuke.ignore
 
 -js dist/www/assets/app.js
 

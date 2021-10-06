@@ -5,10 +5,14 @@ using Type;
 class RouteContext<T> extends Route<T> {
   final context:Context = new Context();
 
-  public function new(?services:Array<ServiceProvider>, children:Array<Route<T>>) {
+  public function new(?services:Array<ServiceProvider>, ?children:Array<Route<T>>) {
     super();
-    for (service in services) addService(service);
-    for (child in children) addChild(child);
+    if (services != null) for (service in services) addService(service);
+    if (children != null) for (child in children) addChild(child);
+  }
+
+  public function useModule(module:Module<T>) {
+    module.register(this);
   }
 
   public inline function addService(service:ServiceProvider) {

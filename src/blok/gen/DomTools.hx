@@ -1,4 +1,4 @@
-package blok.gen.tools;
+package blok.gen;
 
 class DomTools {  
   static inline function getBody() {

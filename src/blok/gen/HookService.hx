@@ -1,5 +1,6 @@
 package blok.gen;
 
+import blok.GenApi.PageRoute;
 using tink.CoreApi;
 
 enum SiteHook {
@@ -12,8 +13,8 @@ enum SiteHook {
 enum PageHook {
   NoPage;
   PageLoading(url:String);
-  PageLoadingFailed(url:String, error:Error);
-  PageReady(url:String, data:Dynamic, page:Page<Dynamic>);
+  PageFailed(url:String, error:Error, page:PageRoute<Dynamic>);
+  PageReady(url:String, data:Dynamic, page:PageRoute<Dynamic>);
 }
 
 @service(fallback = new HookService())

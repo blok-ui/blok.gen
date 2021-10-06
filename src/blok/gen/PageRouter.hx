@@ -6,28 +6,21 @@ using tink.CoreApi;
 
 @service(fallback = throw 'No page router found')
 class PageRouter implements State {
-  @prop var history:History;
   @prop var routes:RouteContext<PageResult>;
-  @prop var route:LoadingResult<PageResult> = LoadingResult.ofNone();
+  @prop var route:Option<PageResult> = None;
+  @use var history:HistoryService;
   
   @init
   function setup() {
-    addDisposable(history.getObservable().observe(match));
+    addDisposable(history.getHistory().getObservable().observe(match));
   }
 
   public function setUrl(url) {
-    history.push(url);
+    history.getHistory().push(url);
   }
 
   @update
   public function match(url:String) {
-    return {
-      route: switch routes.match(url) {
-        case Some(result):
-          result;
-        case None: 
-          LoadingResult.ofNone();
-      }
-    };
+    return { route: routes.match(url) };
   }
 }

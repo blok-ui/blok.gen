@@ -68,10 +68,8 @@ class Visitor implements Service {
     return new Promise((res, rej) -> {
       var context = kernal.createRouteContext();
       var history = context.getService(HistoryService);
-      var suspend = context.getService(Suspend);
-      var app = context.getService(AppService);
       var hooks = context.getService(HookService);
-      var meta = context.getService(MetadataService);
+      var metadata = context.getService(MetadataService);
       var config = context.getService(Config);
 
       history.setLocation(url);
@@ -83,28 +81,24 @@ class Visitor implements Service {
         e -> rej(new Error(500, e.toString()))
       );
 
-      suspend.status.handle(status -> switch status {
-        case Suspended:
-          Sys.println(' ◧ Waiting on $name');
-          Pending;
-        case Complete:
-          hooks.page.handle(status -> switch status {
-            case PageReady(_, value, _):
-              var data = haxe.Json.stringify(value #if debug , '  ' #end);
-              Sys.println(' ■ Completed: $name');
-              res([
-                process(url, app, meta, config, data, cast root.toConcrete()),
-                ({
-                  path: generateJsonPath(url),
-                  contents: data
-                }:VisitorResult)
-              ]);
-              Handled;
-            default:
-              Sys.println(' ◧ Waiting on data for $name');
-              Pending;
-          });
+      hooks.page.handle(status -> switch status {
+        case PageReady(matched, value, _) if (matched == url):
+          var data = haxe.Json.stringify(value #if debug , '  ' #end);
+          Sys.println(' ■ Completed: $name');
+          res([
+            process(url, config, metadata, data, cast root.toConcrete()),
+            ({
+              path: generateJsonPath(url),
+              contents: data
+            }:VisitorResult)
+          ]);
           Handled;
+        case PageReady(matched, _, _):
+          Sys.println(' ? Hit $matched');
+          Pending;
+        default:
+          Sys.println(' ◧ Waiting on data for $name');
+          Pending;
       });
 
       () -> null; // ??
@@ -112,18 +106,17 @@ class Visitor implements Service {
   }
 
   function process(
-    url:String, 
-    app:AppService,
-    meta:MetadataService,
-    config:Config, 
+    url:String,
+    config:Config,
+    metadata:MetadataService, 
     data:String,
     body:Array<String>
   ):VisitorResult {
-    app.assets.addLocalJs('app.js');
+    config.site.assets.addLocalJs('app.js');
 
     var html = new HtmlDocument({
-      title: meta.getPageTitle(),
-      head: [ for (asset in app.assets) switch asset {
+      title: metadata.title,
+      head: [ for (asset in config.site.assets) switch asset {
         case AssetCss(path, local):
           if (local) path = Path.join([ config.site.url, config.site.assetPath, path ]);
           '<link rel="stylesheet" href="${path.withExtension('css')}"/>';
@@ -136,7 +129,7 @@ class Visitor implements Service {
       body: [
         '<script id="${CompiledDataSource.dataProperty}">window.${CompiledDataSource.dataProperty} = $data</script>',
         '<div id="${config.site.rootId}">${body.join('')}</div>',
-        [ for (asset in app.assets) switch asset {
+        [ for (asset in config.site.assets) switch asset {
           case AssetJs(path, local):
             if (local) path = Path.join([ config.site.url, config.site.assetPath, path ]);
             '<script src="${path}"></script>';

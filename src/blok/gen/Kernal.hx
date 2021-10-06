@@ -1,43 +1,23 @@
 package blok.gen;
 
-import blok.core.foundation.routing.History;
-
 abstract class Kernal {
-  final config:Config;
-  final routeFactories:Array<RouteFactory>;
-  final serviceFactories:Array<ServiceFactory>;
+  final site:SiteModule;
 
-  public function new(config, routeFactories, ?serviceFactories) {
-    this.config = config;
-    this.routeFactories = routeFactories;
-    this.serviceFactories = serviceFactories == null ? [] : serviceFactories;
+  public function new(site) {
+    this.site = site;
   }
+  
+  abstract function getModules():Array<Module<PageResult>>;
 
-  public function addServiceFactory(factory:ServiceFactory) {
-    serviceFactories.push(factory);
-    return this;
-  }
-
-  public function createRouteContext() {
-    var context = new RouteContext([ 
-      config,
-      new HookService(),
-      new Suspend(),
-      new HistoryService(createHistory()),
-      new MetadataService()
-    ], []);
-    for (factory in serviceFactories) {
-      context.addService(factory(context.getContext()));
-    }
-    for (factory in routeFactories) {
-      context.addChild(factory(context.getContext()));
-    }
+  public function createRouteContext():RouteContext<PageResult> {
+    var context:RouteContext<PageResult> = new RouteContext();
+    context.useModule(site);
+    context.useModule(new CoreModule());
+    for (module in getModules()) context.useModule(module);
     return context;
   }
 
-  abstract public function createHistory():History;
-
-  public function createApp(routes) {
+  public function createApp(routes:RouteContext<PageResult>):VNode {
     return App.node({ routes: routes });
   }
 

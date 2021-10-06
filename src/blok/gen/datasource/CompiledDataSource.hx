@@ -1,11 +1,11 @@
 package blok.gen.datasource;
 
+import haxe.ds.Option;
 import js.Browser.window;
 import js.Browser.document;
+import tink.core.Error;
 
 using Reflect;
-using tink.CoreApi;
-using blok.gen.tools.PathTools;
 
 @service(fallback = new CompiledDataSource())
 class CompiledDataSource implements Service {
@@ -25,7 +25,7 @@ class CompiledDataSource implements Service {
     return None;
   }
 
-  public function fetch<T>(path:String):Promise<T> {
+  public inline function fetch<T>(path:String):ObservableResult<T, Error> {
     return http.fetch(path);
   }
 }

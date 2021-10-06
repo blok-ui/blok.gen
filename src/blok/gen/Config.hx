@@ -1,8 +1,11 @@
 package blok.gen;
 
-@service(fallback = throw 'No config found')
+import tink.core.Error;
+
+@service(fallback = throw 'No config found: make sure Config is registered first.')
 class Config implements Service implements Record {
   @prop var site:SiteConfig;
+  @prop var view:ViewConfig;
 
   #if blok.platform.static
     @prop var ssr:SsrConfig;
@@ -15,6 +18,12 @@ class SiteConfig implements Record {
   @prop var appName:String = 'app';
   @prop var rootId:String = 'root';
   @prop var assetPath:String = '/assets';
+  @prop var assets:AssetCollection;
+}
+
+class ViewConfig implements Record {
+  @prop var error:(e:Error)->VNode;
+  @prop var loading:()->VNode;
 }
 
 #if blok.platform.static

@@ -2,7 +2,7 @@ package blok.gen;
 
 using StringTools;
 using tink.CoreApi;
-using blok.gen.tools.PathTools;
+using blok.gen.PathTools;
 
 class RouteCollection<T> extends Route<T> {
   final prefix:Null<String>;
@@ -13,7 +13,7 @@ class RouteCollection<T> extends Route<T> {
     for (child in children) addChild(child);
   }
 
-  override public function match(url:String):Option<LoadingResult<T>> {
+  override public function match(url:String):Option<T> {
     if (prefix != null) {
       if (!url.prepareUrl().startsWith(prefix)) return None;
       url = url.prepareUrl().substr(prefix.length);

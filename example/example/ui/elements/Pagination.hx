@@ -1,6 +1,5 @@
 package example.ui.elements;
 
-using Nuke;
 using Blok;
 
 class Pagination {
@@ -12,11 +11,11 @@ class Pagination {
 
   public static function item(props:{ ?isDisabled:Bool, ?isActive:Bool }, ...children:VNode) {
     return Html.li({ 
-      className: ClassName.ofMap([
-        'page-item' => true,
-        'active' => props.isActive == true,
-        'disabled' => props.isDisabled == true
-      ]) 
+      className: [
+        'page-item',
+        props.isActive == true ? 'active' : null,
+        props.isDisabled == true ? 'disabled' : null
+      ].filter(item -> item != null).join(' ')
     }, ...children);
   }
 }

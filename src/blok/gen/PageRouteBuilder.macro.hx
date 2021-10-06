@@ -4,28 +4,28 @@ import haxe.macro.Expr;
 import haxe.macro.Context;
 import blok.tools.ClassBuilder;
 
-using blok.gen.tools.PathTools;
+import haxe.macro.Expr;
+import haxe.macro.Context;
+import blok.tools.ClassBuilder;
+
+using blok.gen.PathTools;
 using haxe.macro.Tools;
 
-class PageBuilder {
+class PageRouteBuilder {
   public static function build() {
     var builder = ClassBuilder.fromContext();
     var clsTp = builder.getTypePath();
     var url = builder.cls.name.nameToPath();
-
+    
     if (builder.getField('match') != null) {
       Context.error('`match` cannot be manually generated on pages', builder.getField('match').pos);
     }
 
-    if (builder.cls.superClass.t.get().module != 'blok.gen.Page') {
-      Context.error('Pages must extends blok.gen.Page', builder.cls.pos);
+    if (builder.cls.superClass.t.get().module != 'blok.gen.PageRoute') {
+      Context.error('Pages must extend blok.gen.PageRoute', builder.cls.pos);
     }
 
     var dataType = builder.cls.superClass.params[0].toComplexType();
-
-    // switch builder.cls.superClass.t.get() {
-      
-    // }
 
     builder.addClassMetaHandler({
       name: 'page',
@@ -60,10 +60,10 @@ class PageBuilder {
 
       switch loader.kind {
         case FFun(f):
-          if (f.ret != null && Context.unify(f.ret.toType(), Context.getType('blok.gen.LoadingResult'))) {
-            Context.error('`load` must return a blok.gen.LoadingResult', loader.pos);
+          if (f.ret != null && Context.unify(f.ret.toType(), Context.getType('blok.ObservableResult'))) {
+            Context.error('`load` must return a blok.ObservableResult', loader.pos);
           } else if (f.ret == null) {
-            f.ret = macro:blok.gen.LoadingResult<Dynamic>;
+            f.ret = macro:blok.ObservableResult<Dynamic, tink.core.Error>;
           }
 
           args = f.args;
@@ -95,11 +95,11 @@ class PageBuilder {
                   var source = context.getService(blok.gen.datasource.CompiledDataSource);
                   var path = haxe.io.Path.join([ $a{toParams.concat([ macro 'data.json' ])} ]);
                   return switch source.preload(path) {
-                    case Some(data): blok.gen.LoadingResult.ofData(data);
+                    case Some(data): blok.ObservableResult.ofResult(Success(data));
                     case None: source.fetch(path);
                   }
                 case None: 
-                  blok.gen.LoadingResult.ofError(new tink.core.Error(500, 'RouteContext not available'));
+                  blok.ObservableResult.ofResult(Failure(new tink.core.Error(500, 'RouteContext not available')));
               }
             #end
           }
@@ -166,29 +166,16 @@ class PageBuilder {
       ]);
 
       return macro class {
-        override public function match(url:String):haxe.ds.Option<blok.gen.LoadingResult<blok.gen.PageResult>> {
-          return switch blok.gen.tools.PathTools.prepareUrl(url).split('/') {
+        override public function match(url:String):haxe.ds.Option<blok.ObservableResult<blok.VNode, tink.core.Error>> {
+          return switch blok.gen.PathTools.prepareUrl(url).split('/') {
             case ${pattern}:
-              switch load($a{fromParams}).unwrap() {
-                case Ready(data):
-                  Some(blok.gen.LoadingResult.ofData({
-                    data: data,
-                    view: createView(url, data)
-                  }));
-                case Loading(promise):
-                  Some(blok.gen.LoadingResult
-                      .ofPromise(promise
-                        .next(data -> {
-                          data: data,
-                          view: createView(url, data)
-                        })
-                      )
-                    );
-                case Failure(error):
-                  Some(blok.gen.LoadingResult.ofError(error));
-                case None:
-                  None;
-              }
+              var hooks = getContext().getService(blok.gen.HookService);
+              hooks.page.update(PageLoading(url));
+              return Some(load($a{fromParams}).map(result -> switch result {
+                case Suspended: Suspended;
+                case Success(data): Success(createView(url, data));
+                case Failure(error): Success(createErrorView(url, error));
+              }));
             default:
               super.match(url);
           }

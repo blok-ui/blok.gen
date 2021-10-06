@@ -1,9 +1,7 @@
 import blok.gen.client.ClientKernal;
-import example.Blog.config;
-import example.Blog.routes;
-import example.Blog.services;
+import example.Site;
 
 function main() {
-  var kernal = new ClientKernal(config, routes, services);
+  var kernal = new ClientKernal(new Site());
   kernal.run();
 }
