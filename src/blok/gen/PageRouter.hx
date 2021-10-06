@@ -1,7 +1,5 @@
 package blok.gen;
 
-import blok.core.foundation.routing.History;
-
 using tink.CoreApi;
 
 @service(fallback = throw 'No page router found')
