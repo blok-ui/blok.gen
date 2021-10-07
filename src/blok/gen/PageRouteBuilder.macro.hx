@@ -4,10 +4,6 @@ import haxe.macro.Expr;
 import haxe.macro.Context;
 import blok.tools.ClassBuilder;
 
-import haxe.macro.Expr;
-import haxe.macro.Context;
-import blok.tools.ClassBuilder;
-
 using blok.gen.PathTools;
 using haxe.macro.Tools;
 
