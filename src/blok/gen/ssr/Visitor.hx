@@ -96,6 +96,9 @@ class Visitor implements Service {
         case PageReady(matched, _, _):
           Sys.println(' ? Hit $matched');
           Pending;
+        case PageFailed(url, error, page):
+          Sys.println(' X Page $name failed with ${error.message}');
+          Handled;
         default:
           Sys.println(' ◧ Waiting on data for $name');
           Pending;

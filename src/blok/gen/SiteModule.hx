@@ -15,7 +15,7 @@ abstract class SiteModule implements Module<PageResult> {
   abstract function provideConfig():Config;
   abstract function provideRoutes(context:Context):Array<PageRoute<Dynamic>>;
   abstract function provideServices(context:Context):Array<ServiceProvider>;
-  #if blok.platform.static 
+  #if blok.platform.static
     abstract function provideDataSources(context:Context):Array<ServiceProvider>;
   #end
 

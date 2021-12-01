@@ -14,7 +14,7 @@ class PathTools {
   }
 
   static inline function isUc(c:String) {
-    return c > 'A' && c < 'Z';
+    return c >= 'A' && c <= 'Z';
   }
 
   public static inline function prepareUrl(url:String) {

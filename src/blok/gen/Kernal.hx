@@ -11,8 +11,8 @@ abstract class Kernal {
 
   public function createRouteContext():RouteContext<PageResult> {
     var context:RouteContext<PageResult> = new RouteContext();
-    context.useModule(site);
     context.useModule(new CoreModule());
+    context.useModule(site);
     for (module in getModules()) context.useModule(module);
     return context;
   }

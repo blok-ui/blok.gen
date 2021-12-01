@@ -1,7 +1,6 @@
 package blok.gen;
 
 using tink.CoreApi;
-using blok.Effect;
 
 @:autoBuild(blok.gen.PageRouteBuilder.build())
 abstract class PageRoute<T> extends Route<PageResult> {
@@ -28,16 +27,10 @@ abstract class PageRoute<T> extends Route<PageResult> {
   }
 
   final function createErrorView(url:String, e:Error) {
-    return HookService.use(hooks -> {
-      renderError(e)
-        .withEffect(() -> hooks.page.update(PageFailed(url, e, this)));
-    });
+    return renderError(e);
   }
 
   final function createView(url:String, data:Dynamic) {
-    return HookService.use(hooks -> {
-      render(decode(data))
-        .withEffect(() -> hooks.page.update(PageReady(url, data, this)));
-    });
+    return render(decode(data));
   } 
 }

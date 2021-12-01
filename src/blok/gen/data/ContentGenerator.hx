@@ -23,10 +23,10 @@ class ContentGenerator {
           for (p in node.attributes()) props[p] = node.get(p);
           new Content({
             type: '@html',
+            children: generate(node),
             data: {
               tag: node.nodeName,
-              props: props,
-              children: generate(node)
+              props: props
             }
           });
         case PCData if (node.nodeValue == '\n' || node.nodeValue.trim() == ''): 

@@ -166,11 +166,26 @@ class PageRouteBuilder {
           return switch blok.gen.PathTools.prepareUrl(url).split('/') {
             case ${pattern}:
               var hooks = getContext().getService(blok.gen.HookService);
-              hooks.page.update(PageLoading(url));
               return Some(load($a{fromParams}).map(result -> switch result {
-                case Suspended: Suspended;
-                case Success(data): Success(createView(url, data));
-                case Failure(error): Success(createErrorView(url, error));
+                case Suspended:
+                  hooks.page.update(PageLoading(url));
+                  Suspended;
+                case Success(data):
+                  var marked = false;
+                  var view = blok.Effect.withEffect(
+                    createView(url, data),
+                    () -> if (!marked) {
+                      marked = true;
+                      hooks.page.update(PageReady(url, data, this));
+                    }
+                  );
+                  Success(view);
+                case Failure(error): 
+                  var view = blok.Effect.withEffect(
+                    createErrorView(url, error),
+                    () -> hooks.page.update(PageFailed(url, error, this))
+                  );
+                  Success(view);
               }));
             default:
               super.match(url);

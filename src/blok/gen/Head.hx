@@ -10,7 +10,7 @@ class Head extends Component {
   // Todo: assets and stuff too
 
   @before
-  function setBrowserTitle() {
+  function setDocumentTitle() {
     var title = [ siteTitle, pageTitle ].filter(t -> t != null).join(' | ');
     #if blok.platform.dom
       DomTools.setTitle(title);

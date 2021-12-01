@@ -3,11 +3,15 @@ package blok.gen.ssr;
 using tink.CoreApi;
 
 class SsrKernal extends Kernal {
+  public final hooks:SsrHooks = new SsrHooks();
+  
   function getModules():Array<Module<PageResult>> {
     return [ new SsrModule() ];
   }
 
   public function run() {
+    hooks.status.update(Generating);
+
     var visitor = new Visitor(this);
     var config = site.getConfig();
     var writer = new FileWriter(config.ssr.destination);
@@ -22,6 +26,7 @@ class SsrKernal extends Kernal {
         writer.write(result.path, result.contents);
       })).handle(o -> switch o {
         case Success(_):
+          hooks.status.update(Complete(config));
           Sys.println('');
           Sys.println('Build completed with no errors.');
           Sys.exit(0);

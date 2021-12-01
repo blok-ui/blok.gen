@@ -74,7 +74,7 @@ class ImageDataSource implements Service {
       if (srcAge <= destAge) return if (isVaildExtendion(src)) 
         Image.getInfo(src);
       else
-        return Promise.resolve(({
+        Promise.resolve(({
           width: 0,
           height: 0,
           format: 'unknown'
