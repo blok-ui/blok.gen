@@ -4,6 +4,22 @@ using StringTools;
 using tink.CoreApi;
 using blok.gen.PathTools;
 
+/**
+  RouteCollections allow you to bundle a number of routes
+  together, optionally with a prefix.
+
+  For example:
+
+  ```haxe
+    var routes = new RouteCollection([
+      new ExampleRoute('bar')
+    ], 'foo');
+
+    var result = routes.match('foo/bar'); // -> Some(...)
+  ```
+
+  Note how the RouteCollection adds the prefix to all sub-routes.
+**/
 class RouteCollection<T> extends Route<T> {
   final prefix:Null<String>;
 

@@ -2,6 +2,12 @@ package blok.gen;
 
 using Type;
 
+/**
+  The RouteContext is responsible for wiring up services from
+  `blok.gen.Modules`.
+
+  @todo: more info
+**/
 class RouteContext<T> extends Route<T> {
   final context:Context = new Context();
 
@@ -27,7 +33,10 @@ class RouteContext<T> extends Route<T> {
     return context;
   }
 
-  public function provide(cb) {
+  /**
+    Create a provider with all of this RouteContext's services.
+  **/
+  public function wrap(cb) {
     return Provider.forContext(context, cb);
   }
 }

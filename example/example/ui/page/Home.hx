@@ -1,27 +1,17 @@
-package example.page;
+package example.ui.page;
 
 import example.ui.elements.Container;
 import example.ui.layout.DefaultLayout;
+import example.route.PostRoute;
+import example.route.PostArchiveRoute;
 import example.data.BlogPost;
 
 using Blok;
-using blok.GenApi;
-using Reflect;
-using tink.CoreApi;
 
-@page(route = '/')
-class Home extends PageRoute<Array<BlogPost>> {
-  public function load() {
-    return getService(example.datasource.BlogPostDataSource)
-      .findPosts(0, 3)
-      .toObservableResult();
-  }
+class Home extends Component {
+  @prop var posts:Array<BlogPost>;
 
-  public function decode(data:Dynamic):Array<BlogPost> {
-    return (data.field('data'):Array<Dynamic>).map(BlogPost.new);
-  }
-
-  public function render(posts:Array<BlogPost>) {
+  function render() {
     return DefaultLayout.node({ 
       pageTitle: 'Home',
       children: [
@@ -30,7 +20,7 @@ class Home extends PageRoute<Array<BlogPost>> {
           Container.row(
             Container.column({ span: 6 },
               Html.p({},
-                Html.text('This is an example of how `blok.gen` might work!')  
+                Html.text('This is an example of how `blok.gen2` might work!')  
               )
             ),
             Container.column({ span: 3 },
@@ -38,14 +28,12 @@ class Home extends PageRoute<Array<BlogPost>> {
               Html.div({
                 className: 'list-group'
               }, ...[ for (post in posts) 
-                Post.link({
+                PostRoute.link({
                   className: 'list-group-item list-group-item-action',
                   id: post.id 
                 }, Html.text(post.title))  
               ]),
-              PostArchive.link({
-                page: 1
-              }, Html.text('See All'))
+              PostArchiveRoute.link({ page: 1 }, Html.text('See All'))
             )
           )
         )

@@ -1,7 +1,6 @@
-import blok.gen.ssr.SsrKernal;
-import example.Site;
+import blok.gen2.app.StaticKernel;
 
 function main() {
-  var kernal = new SsrKernal(new Site());
+  var kernal = new StaticKernel(new ExampleModule());
   kernal.run();
 }

@@ -2,6 +2,7 @@ package blok.gen;
 
 using tink.CoreApi;
 
+@:deprecated('Use gen2')
 @:autoBuild(blok.gen.PageRouteBuilder.build())
 abstract class PageRoute<T> extends Route<PageResult> {
   var context:Null<Context> = null;

@@ -2,11 +2,12 @@ package blok.gen;
 
 import tink.core.Error;
 
+@:deprecated('use gen2')
 class App extends Component {
   @prop var routes:RouteContext<PageResult>;
   
   function render() {
-    return routes.provide(context -> PageRouter.provide({ routes: routes }, context -> 
+    return routes.wrap(context -> PageRouter.provide({ routes: routes }, context -> 
       PageRouter.observe(context, router -> switch router.route {
         case Some(result): 
           PageLoader.node({ 

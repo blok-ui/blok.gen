@@ -2,6 +2,7 @@ package blok.gen;
 
 import tink.core.Error;
 
+@:deprecated('Use gen2')
 @service(fallback = throw 'No config found: make sure Config is registered first.')
 class Config implements Service implements Record {
   @prop var site:SiteConfig;

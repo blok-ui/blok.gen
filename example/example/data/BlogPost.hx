@@ -1,8 +1,8 @@
 package example.data;
 
 import blok.Record;
-import blok.gen.data.Id;
-import blok.gen.data.Content;
+import blok.gen2.data.Id;
+import blok.gen2.content.Content;
 
 using Reflect;
 using tink.CoreApi;

@@ -1,7 +1,7 @@
 package example.ui.elements;
 
-import blok.gen.Config;
-import example.page.Home;
+import blok.gen2.core.Config;
+import example.route.HomeRoute;
 
 using Blok;
 
@@ -19,7 +19,7 @@ class Navbar {
       Html.div({
         className: 'd-flex align-items-center'
       },
-        Home.link({
+        HomeRoute.link({
           className: 'navbar-brand'
         }, Html.text(config.site.title))
       )

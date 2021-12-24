@@ -141,7 +141,7 @@ class PageRouteBuilder {
           kind: FFun({
             args: [
               { name: 'props', type: macro:$linkProps },
-              { name: 'children', type: macro:haxe.Rest<blok.VNode> } 
+              { name: 'children', type: macro:haxe.Rest<blok.VNode> }
             ],
             expr: macro $b{linkBody}
           }),

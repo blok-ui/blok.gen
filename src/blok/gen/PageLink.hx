@@ -2,6 +2,7 @@ package blok.gen;
 
 using haxe.io.Path;
 
+@:deprecated('Use gen2')
 class PageLink extends Component {
   @prop var className:Null<String> = null;
   @prop var url:String;
