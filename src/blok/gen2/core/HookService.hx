@@ -5,6 +5,7 @@ using tink.CoreApi;
 enum DataHook {
   NoData;
   DataReady(url:String, data:Dynamic);
+  DataExport(url:String, data:Dynamic);
 }
 
 enum PageHook {

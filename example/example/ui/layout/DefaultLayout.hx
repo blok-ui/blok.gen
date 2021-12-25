@@ -42,7 +42,7 @@ class DefaultLayout extends Component {
               role: 'alert',
               onclick: _ -> hooks.page.update(NoPage),
             }, Html.text('Failed to load: $url'),  Html.text(error.message));
-          case PageLoading(_): 
+          case PageLoading(_):
             Html.div({
               className: 'alert alert-info',
               role: 'status'

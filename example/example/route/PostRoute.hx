@@ -9,4 +9,4 @@ typedef PostWithSiblings = {
   public final current:BlogPost;
 }
 
-typedef PostRoute = Route<'post/{id:String}', PostWithSiblings>;
+typedef PostRoute = Route<'/post/{id:String}', PostWithSiblings>;

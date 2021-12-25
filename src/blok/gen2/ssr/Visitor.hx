@@ -1,5 +1,6 @@
 package blok.gen2.ssr;
 
+import haxe.Json;
 import haxe.DynamicAccess;
 import blok.ssr.Platform;
 import blok.gen2.core.Config;
@@ -22,6 +23,7 @@ typedef VisitorResult = {
 class Visitor implements Service {
   final visited:Array<String> = [];
   final kernel:Kernel;
+  final exportedData:Array<String> = [];
   var root:Null<ConcreteWidget>;
   var pending:Array<String> = [];
 
@@ -64,7 +66,7 @@ class Visitor implements Service {
 
     var name = url == '' || url == '/' ? 'index' : url;
     
-    Sys.println(' □ Visiting: ${name}');
+    Sys.println(' □ Visiting [ ${name} ]');
 
     return new Promise((res:(data:Array<VisitorResult>)->Void, rej) -> {
       var context = kernel.createContext();
@@ -74,25 +76,46 @@ class Visitor implements Service {
       var config = Config.from(context);
       var bootstrapResults:DynamicAccess<Dynamic> = {};
       var dataResults:DynamicAccess<Dynamic> = {};
+      var exports:Array<VisitorResult> = [];
 
       context.addService(this);
       history.setLocation(url);
 
+      var addToBootstrap = (url:String, data:Dynamic) -> {
+        var path = generateJsonPath(url);
+        if (!bootstrapResults.exists(path)) {
+          bootstrapResults.set(path, data);
+        } else {
+          var target = bootstrapResults.get(path);
+          for (field in data.fields()) {
+            target.setField(field, data.field(field));
+          }
+        }
+      }
+
       var dataLink = hooks.data.observe(status -> switch status {
         case NoData: 
-        case DataReady(matched, data) if (
-          matched == url
-          || (url == '/' && matched == '')
-        ):
-          Sys.println(' ◧ Data for $matched received');
+        case DataReady(matched, data) if (matched == url):
+          Sys.println(' ◧ Local data for [ $matched ] received');
+          addToBootstrap(matched, data);
           for (field in data.fields()) {
-            bootstrapResults.set(field, data.field(field));
             dataResults.set(field, data.field(field));
           }
         case DataReady(matched, data):
-          Sys.println(' ◧ Data for $matched received (boot only)');
-          for (field in data.fields()) {
-            bootstrapResults.set(field, data.field(field));
+          Sys.println(' ◧ Outside data for [ $matched ] received (boot only)');
+          addToBootstrap(matched, data);
+        case DataExport(matched, data):
+          addToBootstrap(matched, data);
+          var path = generateJsonPath(matched);
+          if (!exportedData.contains(path)) {
+            exportedData.push(path);
+            Sys.println(' ◧ Parent data for [ $matched ] received (exporting)');
+            exports.push({
+              path: path,
+              contents: Json.stringify(data)
+            });
+          } else {
+            Sys.println(' ◧ Parent data for [ $matched ] received (already exported, added to boot)');
           }
       });
 
@@ -107,26 +130,28 @@ class Visitor implements Service {
           // var data = haxe.Json.stringify(value #if debug , '  ' #end);
           var bootData = haxe.Json.stringify(bootstrapResults #if debug , '  ' #end);
           var data = haxe.Json.stringify(dataResults #if debug , '  ' #end);
-          Sys.println(' ■ Completed: $name');
+          Sys.println(' ■ [ $name ] completed');
           res([
             process(url, config, metadata, bootData, cast root.toConcrete()),
             ({
               path: generateJsonPath(url),
               contents: data
             }:VisitorResult)
-          ]);
+          ].concat(exports));
           dataLink.dispose();
           Handled;
         case PageReady(matched, _):
-          Sys.println(' ? Hit $matched');
-          Pending;
+          Sys.println(' ? [ $matched ] hit instead of expected [ ${url} ]');
+          dataLink.dispose();
+          rej(new Error(500, 'Invalid route reached'));
+          Handled;
         case PageFailed(_, error):
-          Sys.println(' X Page $name failed with ${error.message}');
+          Sys.println(' X [ $name ] failed with ${error.message}');
           dataLink.dispose();
           rej(error);
           Handled;
         default:
-          Sys.println(' ◧ Waiting on data for $name');
+          Sys.println(' ◧ [ $name ] processing...');
           Pending;
       });
 
@@ -174,12 +199,12 @@ class Visitor implements Service {
   }
 
   function generateHtmlPath(url:String) {
-    if (url.length == 0) return 'index.html';
-    return Path.join([ url, 'index.html' ]);
+    if (url.length == 0) return '/index.html';
+    return Path.join([ url, 'index.html' ]).normalize();
   }
 
   function generateJsonPath(url:String) {
-    if (url.length == 0) return 'data.json';
-    return Path.join([ url, 'data.json' ]);
+    if (url.length == 0) return '/data.json';
+    return Path.join([ url, 'data.json' ]).normalize();
   }
 }

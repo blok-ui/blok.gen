@@ -10,39 +10,7 @@ using blok.gen2.core.Tools;
 @:genericBuild(blok.gen2.routing.RouteBuilder.build())
 class Route<@:const Url, T> {}
 
-abstract class RouteBase<T> extends Matchable {
-  function matchChildren(
-    url:String,
-    load:(context:Context)->Promise<Dynamic>,
-    decode:(context:Context, data:Dynamic)->T,
-    provider:Null<(context:Context, data:T)->Void>
-  ):Option<RouteResult> {
-    for (child in children) switch child.match(url) {
-      case Some(render) if (provider != null):
-        return Some(context -> {
-          var data = load(context).toObservableResult();
-          var config = Config.from(context);
-          return PageLoader.node({
-            loading: config.view.loading,
-            error: config.view.error,
-            result: data.map(result -> switch result {
-              case Suspended: Suspended;
-              case Failure(error): Failure(error);
-              case Success(raw): Success(Provider.provide(
-                { register: context -> provider(context, decode(context, raw)) },
-                render
-              ));
-            })
-          });
-        });
-      case Some(render): 
-        return Some(render);
-      case None:
-    }
-
-    return None;
-  }
-
+abstract class RouteBase<T> implements Matchable {
   function createResult(
     url:String,
     load:(context:Context)->Promise<Dynamic>,

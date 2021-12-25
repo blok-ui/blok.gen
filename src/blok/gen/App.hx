@@ -2,7 +2,6 @@ package blok.gen;
 
 import tink.core.Error;
 
-@:deprecated('use gen2')
 class App extends Component {
   @prop var routes:RouteContext<PageResult>;
   

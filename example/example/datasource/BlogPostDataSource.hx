@@ -35,6 +35,10 @@ class BlogPostDataSource implements Service {
     });
   }
 
+  public function countPosts() {
+    return base().next(posts -> posts.length);
+  }
+
   public function findPosts(first:Int, count:Int) {
     return base().next(files -> {
       var data = files.slice(first, first + count);

@@ -16,6 +16,10 @@ class PostArchive extends Component {
   @prop var posts:Array<BlogPost>;
   
   function render() {
+    if (totalPages > 10) {
+      throw 'wtf';
+    }
+    
     var pagination = [];
     if (page > 1) {
       pagination.push(Pagination.item({}, PostArchiveRoute.link({ 

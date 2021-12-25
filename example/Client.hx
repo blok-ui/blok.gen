@@ -1,7 +1,6 @@
-import blok.gen.client.ClientKernal;
-import example.Site;
+import blok.gen2.app.ClientKernel;
 
 function main() {
-  var kernal = new ClientKernal(new Site());
+  var kernal = new ClientKernel(new ExampleModule());
   kernal.run();
 }

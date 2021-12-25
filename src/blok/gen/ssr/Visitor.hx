@@ -12,7 +12,6 @@ typedef VisitorResult = {
   public final contents:String;
 }
 
-@:deprecated('Use gen2')
 @service(isOptional)
 class Visitor implements Service {
   final visited:Array<String> = [];

@@ -1,9 +1,9 @@
-import blok.gen2.routing.RootRoute;
 import blok.ServiceProvider;
 import blok.gen2.core.Config;
 import blok.gen2.routing.Matchable;
 import blok.gen2.app.AppModule;
 import blok.gen2.content.ContentRenderer;
+import blok.gen2.routing.RouteDataSource;
 import example.route.PostRoute;
 import example.route.PostArchiveRoute;
 import example.route.PostArchiveRoute.decode as decodePostArchive;
@@ -58,29 +58,33 @@ class ExampleModule extends AppModule {
 
 	function provideRoutes():Array<Matchable> {
     return [
-      new RootRoute<BlogConfig>({
+      new RouteDataSource<BlogConfig>({
+        id: 'blog-data',
         #if blok.platform.static
-          load: (context) -> FormattedDataSource
-            .from(context)
-            .get('site.toml')
-            .next(res -> Promise.resolve({ blog: res.formatted })),
+          loaders: [ 
+            (context) -> FormattedDataSource
+              .from(context)
+              .get('site.toml')
+              .next(res -> Promise.resolve(res.formatted)),
+          ],
         #end
-        decode: (context, data:Dynamic) -> BlogConfig.fromJson(data.field('blog')),
-        render: (context, data) -> null,
+        decode: (context, data:Array<Dynamic>) -> {
+          return BlogConfig.fromJson(data[0]);
+        },
         provide: (context, data) -> {
           context.addService(data);
         },
-        children: [
+        routes: [
           new HomeRoute({
             #if blok.platform.static
               load: (context:Context) -> BlogPostDataSource
                 .from(context)
-                .findPosts(0, 3),
+                .findPosts(0, BlogConfig.from(context).perPage),
             #end
             decode: (context:Context, data:Dynamic) -> (data.field('data'):Array<Dynamic>).map(BlogPost.fromJson),
             render: (context:Context, data:Array<BlogPost>) -> Home.node({ posts: data })
           }),
-    
+
           new PostRoute({
             #if blok.platform.static
               load: (context:Context, id:String) -> BlogPostDataSource

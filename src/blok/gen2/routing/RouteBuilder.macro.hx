@@ -97,8 +97,8 @@ class RouteBuilder {
             final loader:$loadFun;
           #else
             function loader(context:Context, url:String) {
-              var compiled = blok.gen2.source.CompiledDataSource.from(context);
-              var path = haxe.io.Path.join([ url, 'data.json' ]);
+              var source = blok.gen2.source.CompiledDataSource.from(context);
+              var path = blok.gen2.source.CompiledDataSource.getJsonDataPath(url);
               return switch source.preload(path) {
                 case Some(data): tink.core.Promise.resolve(data);
                 case None: source.fetch(path);
@@ -112,22 +112,17 @@ class RouteBuilder {
             #end
             decode:$decodeFun,
             render:$renderFun,
-            ?provide:$provideFun,
-            ?children:Array<blok.gen2.routing.Matchable>
+            ?provide:$provideFun
           }) {
-            super();
             #if blok.platform.static
               this.loader = props.load;
             #end
             this.provider = props.provide;
             this.decoder = props.decode;
             this.render = props.render;
-            if (props.children != null) {
-              for (child in props.children) addChild(child);
-            }
           }
 
-          override function match(url:String):tink.core.Option<blok.gen2.routing.RouteResult> {
+          public function match(url:String):tink.core.Option<blok.gen2.routing.RouteResult> {
             if (matcher.match(url)) {
               var load = (context:blok.Context) -> #if blok.platform.static
                 loader($a{loaderCallParams}).next(data -> {
@@ -141,28 +136,6 @@ class RouteBuilder {
                 loader(context, url);
               #end
               return Some(createResult(url, load, decoder, provider, render));
-            }
-
-            if (children.length > 0 && matcherStart.match(url)) {
-              var left = matcherStart.matched(1);
-              var right = matcherStart.matched(2);
-              var load = (context:blok.Context) -> #if blok.platform.static
-                {
-                  if (matcher.match(left)) {
-                    return loader($a{loaderCallParams}).next(data -> {
-                      blok.gen2.core.HookService
-                        .from(context)
-                        .data
-                        .update(DataReady(left, data));
-                      return tink.core.Promise.resolve(data);
-                    });
-                  }
-                  return tink.core.Promise.reject(new tink.core.Error(500, 'Invalid url'));
-                }
-              #else
-                loader(context, left);
-              #end
-              return matchChildren(right, load, decoder, provider);
             }
 
             return None;
