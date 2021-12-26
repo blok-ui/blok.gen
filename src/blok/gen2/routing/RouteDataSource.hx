@@ -13,7 +13,8 @@ using blok.gen2.core.Tools;
 /**
   This is a simple wrapper class that allows you to provide 
   data to a group of sub-routes (for example, you might use it
-  to load site-wide configuration).
+  to load site-wide configuration). An important note: the 
+  loaders will ONLY run if a child route matches.
 
   It likely could use some improvement, but it'll do for now.
 **/

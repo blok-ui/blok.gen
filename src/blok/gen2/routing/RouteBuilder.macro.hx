@@ -85,7 +85,7 @@ class RouteBuilder {
           name: 'Route',
           sub: 'RouteBase',
           params: [ TPType(TPath({ name: 'T', pack: [] })) ]
-        }),
+        }, [], false, true, false),
         fields: (macro class {
           static final matcher:EReg = new EReg($v{path}, '');
           static final matcherStart:EReg = new EReg($v{route.getMatcherStart()}, '');
@@ -126,10 +126,8 @@ class RouteBuilder {
             if (matcher.match(url)) {
               var load = (context:blok.Context) -> #if blok.platform.static
                 loader($a{loaderCallParams}).next(data -> {
-                  blok.gen2.core.HookService
-                    .from(context)
-                    .data
-                    .update(DataReady(url, data));
+                  var hooks = blok.gen2.core.HookService.from(context);
+                  hooks.data.update(DataReady(url, data));
                   return tink.core.Promise.resolve(data);
                 });
               #else

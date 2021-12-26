@@ -4,19 +4,19 @@ using DateTools;
 
 /**
   The TimedCache will hold on to data for a given ammount of
-  time (provided in milleseconds).
+  milleseconds.
 
   Note that the entire cache is cleared when *any* item becomes invalid,
-  which ensures that data gets out of sync. Each CacheItem has its own 
-  lifetime, however, which means that data is only cleared when the most
-  stale item is hit.
+  which ensures that data never gets out of sync. Each CacheItem has its own 
+  lifetime, meaning that the cache is only cleared when the most stale item 
+  is hit.
 
   Note: if you set `lifetime` to 0 you'll probably break your app.
 **/
 class TimedCache<T> implements Cache<T> {
-  public static final ONE_MINUTE = 60000;
-  public static final ONE_HOUR = 3600000;
-  public static final ONE_DAY = 86400000;
+  public inline static final ONE_MINUTE = 60000;
+  public inline static final ONE_HOUR = 3600000;
+  public inline static final ONE_DAY = 86400000;
 
   var lifetime:Float;
   var items:Map<String, CacheItem<T>> = [];
@@ -28,7 +28,6 @@ class TimedCache<T> implements Cache<T> {
 	public function hit(key:String):Bool {
 		if (!items.exists(key)) return false;
     if (items.get(key).invalid()) {
-      trace(key);
       clear();
       return false;
     }
@@ -45,7 +44,9 @@ class TimedCache<T> implements Cache<T> {
     items.set(key, new CacheItem(value, time));
   }
 
-	public function remove(key:String) {}
+	public function remove(key:String) {
+    items.remove(key);
+  }
 
   public function clear() {
     items.clear();
