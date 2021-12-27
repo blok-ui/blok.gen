@@ -21,10 +21,6 @@ class RouteParser {
     return '^' + matcher + '$';
   }
 
-  public function getMatcherStart() {
-    return '^(' + parseStart() + ')(.*)';
-  }
-
   public function getParams() {
     return params;
   }
@@ -43,20 +39,6 @@ class RouteParser {
       }
     }
     return out.split(SPLIT);
-  }
-
-  public function parseStart() {
-    position = 0;
-    start = 0;
-    var out = '';
-    while (!isAtEnd()) {
-      if (match('{')) {
-        out += parseCapture();
-      } else {
-        out += advance();
-      }
-    }
-    return out;
   }
 
   function parse() {

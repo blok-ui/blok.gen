@@ -1,0 +1,3 @@
+# @install: lix --silent download "gh://github.com/wartman/boxup.compiler#5584a58acb2832a265e5d42ee44700d41cae863c" into boxup/0.0.1-alpha.1/github/5584a58acb2832a265e5d42ee44700d41cae863c
+-cp ${HAXE_LIBCACHE}/boxup/0.0.1-alpha.1/github/5584a58acb2832a265e5d42ee44700d41cae863c/src/
+-D boxup=0.0.1-alpha.1

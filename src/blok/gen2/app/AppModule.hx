@@ -19,8 +19,11 @@ abstract class AppModule implements Module {
   }
 
   abstract function provideConfig():Config;
+  
   abstract function provideRoutes():Array<Matchable>;
+  
   abstract function provideServices():Array<ServiceProvider>;
+  
   #if blok.platform.static
     abstract function provideDataSources():Array<ServiceProvider>;
   #end

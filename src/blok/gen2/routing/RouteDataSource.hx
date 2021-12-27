@@ -54,7 +54,7 @@ class RouteDataSource<T> implements Matchable {
     collecton = new RouteCollection(props.routes);
   }
 
-	public function match(url:String):Option<RouteResult> {
+  public function match(url:String):Option<RouteResult> {
     return switch collecton.match(url) {
       case Some(render): Some(context -> {
         var config = Config.from(context);
@@ -83,5 +83,5 @@ class RouteDataSource<T> implements Matchable {
       });
       case None: None;
     }
-	}
+  }
 }

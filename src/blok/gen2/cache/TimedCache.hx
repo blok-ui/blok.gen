@@ -25,26 +25,26 @@ class TimedCache<T> implements Cache<T> {
     this.lifetime = lifetime;
   }
 
-	public function hit(key:String):Bool {
-		if (!items.exists(key)) return false;
+  public function hit(key:String):Bool {
+    if (!items.exists(key)) return false;
     if (items.get(key).invalid()) {
       clear();
       return false;
     }
     return true;
-	}
+  }
 
-	public function get(key:String):T {
-		return items.get(key).get();
-	}
+  public function get(key:String):T {
+    return items.get(key).get();
+  }
 
-	public function set(key:String, value:T, ?lifetime:Float) {
+  public function set(key:String, value:T, ?lifetime:Float) {
     if (lifetime == null) lifetime = this.lifetime;
     var time = Date.now().delta(lifetime);
     items.set(key, new CacheItem(value, time));
   }
 
-	public function remove(key:String) {
+  public function remove(key:String) {
     items.remove(key);
   }
 

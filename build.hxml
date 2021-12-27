@@ -24,7 +24,7 @@
 -lib image
 -lib toml
 -lib markdown
--lib boxup.compiler
+-lib boxup
 -lib blok.platform.static
 
 -main Ssr

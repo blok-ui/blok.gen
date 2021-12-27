@@ -46,6 +46,5 @@ class StaticKernel extends Kernel {
         Sys.println('Build failed with: ${failure.message}');
         Sys.exit(1);
     });
-    
   }
 }

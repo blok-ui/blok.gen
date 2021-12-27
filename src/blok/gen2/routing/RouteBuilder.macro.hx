@@ -88,7 +88,6 @@ class RouteBuilder {
         }, [], false, true, false),
         fields: (macro class {
           static final matcher:EReg = new EReg($v{path}, '');
-          static final matcherStart:EReg = new EReg($v{route.getMatcherStart()}, '');
 
           final render:$renderFun;
           final decoder:$decodeFun;
