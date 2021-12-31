@@ -1,4 +1,4 @@
-package blok.gen2.ssr;
+package blok.gen2.build;
 
 using sys.io.File;
 using sys.FileSystem;

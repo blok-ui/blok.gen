@@ -1,5 +1,8 @@
 package blok.gen2.cache;
 
+import blok.context.Service;
+import blok.core.Disposable;
+
 /**
   Provides an app-wide Cache implementation. By default, we just use the
   service's fallback (which is a TimedCache that keeps items around for a 

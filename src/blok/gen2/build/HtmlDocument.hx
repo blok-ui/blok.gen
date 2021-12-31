@@ -1,6 +1,7 @@
-package blok.gen2.ssr;
+package blok.gen2.build;
 
 import haxe.ds.ReadOnlyArray;
+import blok.data.Record;
 
 class HtmlDocument implements Record {
   @prop var title:String;

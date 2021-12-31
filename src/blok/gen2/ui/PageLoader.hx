@@ -1,6 +1,9 @@
 package blok.gen2.ui;
 
-import blok.core.html.Hydratable;
+import blok.ui.VNode;
+import blok.ui.Component;
+import blok.state.ObservableResult;
+import blok.html.Hydratable;
 
 #if blok.platform.dom
   import blok.dom.Hydrator.hydrateChildren;

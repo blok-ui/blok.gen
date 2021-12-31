@@ -2,6 +2,7 @@ package blok.gen2.source;
 
 import js.Browser.window;
 import js.Browser.document;
+import blok.context.Service;
 import blok.gen2.core.HookService;
 import blok.gen2.cache.CacheService;
 

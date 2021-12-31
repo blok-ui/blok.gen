@@ -1,6 +1,6 @@
 package blok.gen.ssr;
 
-import blok.core.foundation.routing.history.StaticHistory;
+import blok.foundation.routing.history.StaticHistory;
 
 class SsrModule implements Module<PageResult> {
   public function new() {}

@@ -1,21 +1,26 @@
 package blok.gen2.app;
 
-import blok.core.foundation.routing.history.StaticHistory;
+#if !blok.platform.static
+  #error "StaticKernel may only be used with blok.platform.static";
+#end
+
+import blok.context.Context;
+import blok.foundation.routing.history.StaticHistory;
 import blok.gen2.routing.HistoryService;
 import blok.gen2.core.Kernel;
-import blok.gen2.ssr.Visitor;
-import blok.gen2.ssr.FileWriter;
-import blok.gen2.ssr.MetadataService;
+import blok.gen2.build.Visitor;
+import blok.gen2.build.FileWriter;
+import blok.gen2.build.MetadataService;
 
 using tink.CoreApi;
 
 class StaticKernel extends Kernel {
-	function addCoreServices(context:Context) {
+  function addCoreServices(context:Context) {
     context.addService(new HistoryService(new StaticHistory('/')));
     context.addService(new MetadataService());
   }
 
-	public function run() {
+  public function run() {
     // hooks.status.update(Generating);
 
     var visitor = new Visitor(this);

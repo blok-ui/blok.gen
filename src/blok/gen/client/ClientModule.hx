@@ -2,7 +2,7 @@ package blok.gen.client;
 
 import blok.gen.datasource.HttpDataSource;
 import blok.gen.datasource.CompiledDataSource;
-import blok.core.foundation.routing.history.BrowserHistory;
+import blok.foundation.routing.history.BrowserHistory;
 
 class ClientModule implements Module<PageResult> {
   public function new() {}

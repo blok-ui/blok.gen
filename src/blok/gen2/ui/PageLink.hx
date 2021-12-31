@@ -1,5 +1,8 @@
 package blok.gen2.ui;
 
+import blok.ui.Component;
+import blok.ui.Html;
+import blok.ui.VNode;
 import blok.gen2.routing.Router;
 import blok.gen2.core.Config;
 
@@ -12,7 +15,7 @@ class PageLink extends Component {
   @use var router:Router;
   @use var config:Config;
   #if blok.platform.static
-    @use var visitor:blok.gen2.ssr.Visitor;
+    @use var visitor:blok.gen2.build.Visitor;
   #end
   
   #if blok.platform.static

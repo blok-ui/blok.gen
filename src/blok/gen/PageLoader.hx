@@ -1,6 +1,6 @@
 package blok.gen;
 
-import blok.core.html.Hydratable;
+import blok.html.Hydratable;
 #if blok.platform.dom
   import blok.dom.Hydrator.hydrateChildren;
 #end

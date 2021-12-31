@@ -1,6 +1,6 @@
 package example.datasource;
 
-import blok.Service;
+import blok.context.Service;
 import blok.gen2.data.Id;
 import blok.gen2.content.ContentGenerator;
 import blok.gen2.source.FormattedFileResult;

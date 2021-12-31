@@ -1,12 +1,13 @@
 package blok.gen2.routing;
 
-import blok.core.foundation.routing.History;
+import blok.context.Service;
+import blok.foundation.routing.History;
 
 @service(fallback = new HistoryService(
   #if blok.platform.static
-    new blok.core.foundation.routing.history.StaticHistory('/')
+    new blok.foundation.routing.history.StaticHistory('/')
   #else
-    new blok.core.foundation.routing.history.BrowserHistory()
+    new blok.foundation.routing.history.BrowserHistory()
   #end
 ))
 class HistoryService implements Service { 

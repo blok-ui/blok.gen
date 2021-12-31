@@ -2,7 +2,7 @@ package blok.gen;
 
 import haxe.macro.Expr;
 import haxe.macro.Context;
-import blok.tools.ClassBuilder;
+import blok.macro.ClassBuilder;
 
 using blok.gen.PathTools;
 using haxe.macro.Tools;
@@ -56,10 +56,10 @@ class PageRouteBuilder {
 
       switch loader.kind {
         case FFun(f):
-          if (f.ret != null && Context.unify(f.ret.toType(), Context.getType('blok.ObservableResult'))) {
-            Context.error('`load` must return a blok.ObservableResult', loader.pos);
+          if (f.ret != null && Context.unify(f.ret.toType(), Context.getType('blok.state.ObservableResult'))) {
+            Context.error('`load` must return a blok.state.ObservableResult', loader.pos);
           } else if (f.ret == null) {
-            f.ret = macro:blok.ObservableResult<Dynamic, tink.core.Error>;
+            f.ret = macro:blok.state.ObservableResult<Dynamic, tink.core.Error>;
           }
 
           args = f.args;
@@ -91,11 +91,11 @@ class PageRouteBuilder {
                   var source = context.getService(blok.gen.datasource.CompiledDataSource);
                   var path = haxe.io.Path.join([ $a{toParams.concat([ macro 'data.json' ])} ]);
                   return switch source.preload(path) {
-                    case Some(data): blok.ObservableResult.ofResult(Success(data));
+                    case Some(data): blok.state.ObservableResult.ofResult(Success(data));
                     case None: source.fetch(path);
                   }
                 case None: 
-                  blok.ObservableResult.ofResult(Failure(new tink.core.Error(500, 'RouteContext not available')));
+                  blok.state.ObservableResult.ofResult(Failure(new tink.core.Error(500, 'RouteContext not available')));
               }
             #end
           }
@@ -141,7 +141,7 @@ class PageRouteBuilder {
           kind: FFun({
             args: [
               { name: 'props', type: macro:$linkProps },
-              { name: 'children', type: macro:haxe.Rest<blok.VNode> }
+              { name: 'children', type: macro:haxe.Rest<blok.ui.VNode> }
             ],
             expr: macro $b{linkBody}
           }),
@@ -162,7 +162,7 @@ class PageRouteBuilder {
       ]);
 
       return macro class {
-        override public function match(url:String):haxe.ds.Option<blok.ObservableResult<blok.VNode, tink.core.Error>> {
+        override public function match(url:String):haxe.ds.Option<blok.state.ObservableResult<blok.ui.VNode, tink.core.Error>> {
           return switch blok.gen.PathTools.prepareUrl(url).split('/') {
             case ${pattern}:
               var hooks = getContext().getService(blok.gen.HookService);
@@ -172,7 +172,7 @@ class PageRouteBuilder {
                   Suspended;
                 case Success(data):
                   var marked = false;
-                  var view = blok.Effect.withEffect(
+                  var view = blok.ui.Effect.withEffect(
                     createView(url, data),
                     () -> if (!marked) {
                       marked = true;
@@ -181,7 +181,7 @@ class PageRouteBuilder {
                   );
                   Success(view);
                 case Failure(error): 
-                  var view = blok.Effect.withEffect(
+                  var view = blok.ui.Effect.withEffect(
                     createErrorView(url, error),
                     () -> hooks.page.update(PageFailed(url, error, this))
                   );

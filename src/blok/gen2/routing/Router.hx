@@ -1,5 +1,7 @@
 package blok.gen2.routing;
 
+import blok.state.State;
+
 using tink.CoreApi;
 
 @service(fallback = throw 'No router found')

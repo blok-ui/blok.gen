@@ -1,6 +1,8 @@
 package blok.gen2.core;
 
 using tink.CoreApi;
+import blok.context.Service;
+import blok.state.Observable;
 
 enum DataHook {
   NoData;

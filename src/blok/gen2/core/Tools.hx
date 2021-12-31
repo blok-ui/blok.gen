@@ -1,5 +1,7 @@
 package blok.gen2.core;
 
+import blok.state.ObservableResult;
+
 using tink.CoreApi;
 
 class Tools {

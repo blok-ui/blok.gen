@@ -1,4 +1,6 @@
-package blok.gen2.ssr;
+package blok.gen2.build;
+
+import blok.context.Service;
 
 @service(fallback = new MetadataService())
 class MetadataService implements Service {

@@ -1,7 +1,9 @@
 package blok.gen2.content;
 
-import blok.Html;
-import blok.VElement;
+import blok.context.Service;
+import blok.ui.Html;
+import blok.ui.VElement;
+import blok.ui.VNode;
 
 @service(fallback = ContentRenderer.withDefaults())
 class ContentRenderer implements Service {

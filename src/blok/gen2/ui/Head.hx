@@ -1,10 +1,12 @@
 package blok.gen2.ui;
 
+import blok.ui.Component;
+
 class Head extends Component {
   @prop var siteTitle:String;
   @prop var pageTitle:String;
   #if blok.platform.static 
-    @use var metadata:blok.gen2.ssr.MetadataService;
+    @use var metadata:blok.gen2.build.MetadataService;
   #end
 
   // Todo: assets and stuff too

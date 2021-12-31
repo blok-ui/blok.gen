@@ -1,6 +1,7 @@
 package blok.gen2.source;
 
 import js.Browser.window;
+import blok.context.Service;
 import blok.gen2.core.Config;
 
 using tink.CoreApi;

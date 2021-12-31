@@ -1,8 +1,13 @@
 package blok.gen2.app;
 
+#if !blok.platform.dom
+  #error "ClientKernel may only be used with blok.platform.dom";
+#end
+
 import js.Browser;
+import blok.context.Context;
 import blok.dom.Platform;
-import blok.core.foundation.routing.history.BrowserHistory;
+import blok.foundation.routing.history.BrowserHistory;
 import blok.gen2.core.Config;
 import blok.gen2.core.Kernel;
 import blok.gen2.source.HttpDataSource;

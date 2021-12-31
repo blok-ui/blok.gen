@@ -1,4 +1,4 @@
-import blok.ServiceProvider;
+import blok.context.ServiceProvider;
 import blok.gen2.core.Config;
 import blok.gen2.routing.Matchable;
 import blok.gen2.app.AppModule;

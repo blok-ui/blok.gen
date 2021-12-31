@@ -1,6 +1,9 @@
 package blok.gen2.core;
 
 import tink.core.Error;
+import blok.data.Record;
+import blok.ui.VNode;
+import blok.context.Service;
 
 @service(fallback = throw 'No config found: make sure Config is registered first.')
 class Config implements Service implements Record {

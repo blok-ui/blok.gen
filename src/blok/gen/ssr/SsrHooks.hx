@@ -1,6 +1,6 @@
 package blok.gen.ssr;
 
-import blok.Observable;
+import blok.state.Observable;
 
 enum SsrStatus {
   NotStarted;

@@ -1,5 +1,7 @@
 package blok.gen2.routing;
 
+import blok.context.Service;
+
 using tink.CoreApi;
 
 @service(fallback = new RouteService([]))

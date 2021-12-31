@@ -59,19 +59,19 @@ class RouteBuilder {
       }
 
       var renderFun:ComplexType = TFunction(
-        [ macro:blok.Context, macro:T ],
-        macro:blok.VNode
+        [ macro:blok.context.Context, macro:T ],
+        macro:blok.ui.VNode
       );
       var loadFun:ComplexType = TFunction(
-        [ macro:blok.Context ].concat(types),
+        [ macro:blok.context.Context ].concat(types),
         macro:tink.core.Promise<Dynamic>
       );
       var decodeFun:ComplexType = TFunction(
-        [ macro:blok.Context, macro:Dynamic ],
+        [ macro:blok.context.Context, macro:Dynamic ],
         macro:T
       );
       var provideFun:ComplexType = TFunction(
-        [ macro:blok.Context, macro:T ],
+        [ macro:blok.context.Context, macro:T ],
         macro:Void
       );
 
@@ -95,7 +95,7 @@ class RouteBuilder {
           #if blok.platform.static
             final loader:$loadFun;
           #else
-            function loader(context:Context, url:String) {
+            function loader(context:blok.context.Context, url:String) {
               var source = blok.gen2.source.CompiledDataSource.from(context);
               var path = blok.gen2.source.CompiledDataSource.getJsonDataPath(url);
               return switch source.preload(path) {
@@ -123,7 +123,7 @@ class RouteBuilder {
 
           public function match(url:String):tink.core.Option<blok.gen2.routing.RouteResult> {
             if (matcher.match(url)) {
-              var load = (context:blok.Context) -> #if blok.platform.static
+              var load = (context:blok.context.Context) -> #if blok.platform.static
                 loader($a{loaderCallParams}).next(data -> {
                   var hooks = blok.gen2.core.HookService.from(context);
                   hooks.data.update(DataReady(url, data));
@@ -151,7 +151,7 @@ class RouteBuilder {
                     pos: (macro null).pos
                   }:Field)
                 ])) },
-                { name: 'children', type: macro:haxe.Rest<blok.VNode> }
+                { name: 'children', type: macro:haxe.Rest<blok.ui.VNode> }
               ],
               expr: macro return blok.gen2.ui.PageLink.node({
                 className: props.className,

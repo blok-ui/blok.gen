@@ -1,4 +1,4 @@
-package blok.gen2.content;
+package blok.gen.data;
 
 class Content implements Record {
   @prop var type:String;
