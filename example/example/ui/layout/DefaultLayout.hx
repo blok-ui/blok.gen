@@ -24,6 +24,19 @@ class DefaultLayout extends Component {
       }),
       Navbar.container( 
         Navbar.brand(),
+        HookService.use(hooks -> hooks.page.mapToVNode(status -> switch status {
+          case PageLoading(_): Html.div(
+            {
+              className: 'spinner-border',
+              role: 'status',
+              style: 'border-right-color:#fff;'
+            },
+            Html.span({ className: 'visually-hidden' }, 
+              Html.text('Loading...')
+            )
+          );
+          default: null;
+        })),
         Navbar.menu( 
           Navbar.option(
             PostArchiveRoute.link({
@@ -32,22 +45,6 @@ class DefaultLayout extends Component {
             }, Html.text('Archive'))
           )
         )
-      ),
-      HookService.use(hooks ->
-        hooks.page.mapToVNode(status -> switch status {
-          case NoPage | PageReady(_, _): null;
-          case PageFailed(url, error):
-            Html.div({
-              className: 'alert alert-danger',
-              role: 'alert',
-              onclick: _ -> hooks.page.update(NoPage),
-            }, Html.text('Failed to load: $url'),  Html.text(error.message));
-          case PageLoading(_):
-            Html.div({
-              className: 'alert alert-info',
-              role: 'status'
-            }, Html.text('Loading...'));
-        })
       ),
       Container.main(...children)
     ];

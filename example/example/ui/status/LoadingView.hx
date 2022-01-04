@@ -7,6 +7,7 @@ using Blok;
 class LoadingView extends Component {
   function render() {
     return DefaultLayout.node({
+      pageTitle: 'Loading...',
       children: [
         Html.div(
           {

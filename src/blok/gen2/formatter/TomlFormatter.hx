@@ -1,7 +1,7 @@
 package blok.gen2.formatter;
 
-import toml.TomlError;
 import blok.gen2.source.FileResult;
+import toml.TomlError;
 
 using tink.CoreApi;
 

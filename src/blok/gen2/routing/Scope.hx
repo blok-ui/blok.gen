@@ -20,7 +20,7 @@ using blok.gen2.core.Tools;
 
   It likely could use some improvement, but it'll do for now.
 **/
-class RouteDataSource<T> implements Matchable {
+class Scope<T> implements Matchable {
   final dataId:String;
   final loaders:Array<(context:Context)->Promise<Dynamic>>;
   final decode:(context:Context, data:Array<Dynamic>)->T;
@@ -67,7 +67,9 @@ class RouteDataSource<T> implements Matchable {
           result: Promise
             .inParallel(loaders.map(load -> load(context)))
             .next(results -> {
-              HookService.from(context).data.update(DataExport(dataId, results));
+              #if blok.platform.static
+                HookService.from(context).data.update(DataExport(dataId, results));
+              #end
               decode(context, results);
             })
             .toObservableResult()

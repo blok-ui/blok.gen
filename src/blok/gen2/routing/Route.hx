@@ -93,6 +93,7 @@ abstract class RouteBase<T> implements Matchable {
               }
             ));
           case Failure(error):
+            hooks.page.update(PageFailed(url, error));
             Failure(error);
         })
       });

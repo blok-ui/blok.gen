@@ -1,5 +1,6 @@
 package blok.gen2.formatter;
 
+import blok.data.Record;
 import boxup.Generator;
 import boxup.Reporter;
 import boxup.schema.Schema;

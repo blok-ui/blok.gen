@@ -9,6 +9,7 @@ class ErrorView extends Component {
 
   function render() {
     return DefaultLayout.node({
+      pageTitle: 'Error',
       children: [
         Html.text(message)
       ]

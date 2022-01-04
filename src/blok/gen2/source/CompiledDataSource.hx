@@ -51,7 +51,6 @@ class CompiledDataSource implements Service {
 
   public inline function fetch<T>(path:String):Promise<T> {
     return http.fetch(path).next(data -> {
-      trace(path);
       cache.getCache().set(path, data);
       return Promise.resolve(data);
     });
