@@ -61,7 +61,7 @@ class PostRoute extends Route<'/post/{id:Int}', Post> {
     }
   #end
 
-  public function (context:Context, data:Dynamic) {
+  public function decode(context:Context, data:Dynamic) {
     return my.data.Post.fromJson(data);
   }
 

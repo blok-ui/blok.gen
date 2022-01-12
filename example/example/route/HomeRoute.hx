@@ -58,16 +58,3 @@ class HomeRoute extends Route<'/', Array<BlogPost>> {
     });
   }
 } 
-
-// function create(renderer):Matchable {
-//   return new HomeRoute({
-//     #if blok.platform.static
-//       load: (context:Context) -> BlogPostDataSource
-//         .from(context)
-//         .findPosts(0, BlogConfig.from(context).perPage),
-//     #end
-//     decode: (context:Context, data:Dynamic) -> 
-//       (data.field('data'):Array<Dynamic>).map(BlogPost.fromJson),
-//     render: renderer
-//   });
-// }
