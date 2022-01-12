@@ -25,7 +25,7 @@ class RouteParser {
     return params;
   }
   
-  public function parseBuilder() {
+  public function getParts() {
     position = 0;
     start = 0;
     var out = '';

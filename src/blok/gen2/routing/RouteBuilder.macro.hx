@@ -3,12 +3,13 @@ package blok.gen2.routing;
 import haxe.macro.Context;
 import haxe.macro.Expr;
 import haxe.macro.Type;
+import blok.macro.ClassBuilder;
 
 using haxe.macro.Tools;
+using blok.gen2.macro.Tools;
 
-// @todo: This class is a mess.
 class RouteBuilder {
-  public static function build() {
+  public static function buildGeneric() {
     return switch Context.getLocalType() {
       case TInst(_, [
         TInst(_.get() => {kind: KExpr(macro $v{(url:String)})}, _), 
@@ -19,31 +20,38 @@ class RouteBuilder {
         throw 'assert';
     }
   }
-  
+
   static function buildRoute(url:String, ret:Type):ComplexType {
     var route = new RouteParser(url);
-    var builder = route.parseBuilder();
+    var pos = Context.currentPos();
     var path = route.getMatcher();
+    var params = route.getParams();
+    var builder = route.getParts();
     var suffix = haxe.crypto.Md5.encode(path);
     var pack = [ 'blok', 'gen2', 'routing' ];
     var name = 'Route_${suffix}';
 
-    if (!typeExists(pack.concat([ name ]).join('.'))) {
-      var params = route.getParams();
-      var types:Array<ComplexType> = [ for (entry in params) switch entry.type {
-        case 'Int': macro:Int;
-        default: macro:String;
+    if (!pack.concat([ name ]).join('.').typeExists()) {
+      // var types:Array<ComplexType> = [ for (entry in params) switch entry.type {
+      //   case 'Int': macro:Int;
+      //   default: macro:String;
+      // } ];
+      var routeFields:Array<Field> = [ for (entry in params) switch entry.type {
+        case 'Int': { name: entry.key, kind: FVar(macro:Int), pos: pos };
+        default: { name: entry.key, kind: FVar(macro:String), pos: pos };
       } ];
-      var linkProps:Array<Field> = [ for (i in 0...types.length) 
-        { name: params[i].key, kind: FVar(types[i]), meta: [], pos: (macro null).pos }
-      ];
-      var len = params.length;
-      var typeParams:Array<TypeParamDecl> = [ { name: 'T' } ];
-      var loaderCallParams:Array<Expr> = [ macro context ];
+      var routeParams:ComplexType = TAnonymous(routeFields);
+      var loaderCallParams:Array<Expr> = [ macro context, {
+        expr: EObjectDecl([ for (i in 0...routeFields.length) {
+          field: routeFields[i].name,
+          expr: macro cast matcher.matched($v{i + 1})
+        }  ]),
+        pos: pos
+      } ];
       var pos = Context.currentPos();
       var urlBuilder:Array<Expr> = [ macro $v{builder[0]} ];
-      
-      for (i in 0...len) {
+
+      for (i in 0...params.length) {
         var key = params[i].key;
         urlBuilder.push(switch params[i].type {
           case 'String': macro props.$key;
@@ -54,48 +62,24 @@ class RouteBuilder {
         }
       }
 
-      for (i in 0...len) {
-        loaderCallParams.push(macro cast matcher.matched($v{i + 1}));
-      }
-
-      var renderFun:ComplexType = TFunction(
-        [ macro:blok.context.Context, macro:T ],
-        macro:blok.ui.VNode
-      );
-      var loadFun:ComplexType = TFunction(
-        [ macro:blok.context.Context ].concat(types),
-        macro:tink.core.Promise<Dynamic>
-      );
-      var decodeFun:ComplexType = TFunction(
-        [ macro:blok.context.Context, macro:Dynamic ],
-        macro:T
-      );
-      var provideFun:ComplexType = TFunction(
-        [ macro:blok.context.Context, macro:T ],
-        macro:Void
-      );
-
       Context.defineType({
         pack: pack,
         name: name,
         pos: pos,
-        params: typeParams,
+        params: [ { name: 'T' } ],
         kind: TDClass({
           pack: pack,
           name: 'Route',
           sub: 'RouteBase',
           params: [ TPType(TPath({ name: 'T', pack: [] })) ]
-        }, [], false, true, false),
+        }, [], false, false, true),
         fields: (macro class {
           static final matcher:EReg = new EReg($v{path}, '');
-
-          final render:$renderFun;
-          final decoder:$decodeFun;
-          final provider:Null<$provideFun>;
+          
           #if blok.platform.static
-            final loader:$loadFun;
+            abstract function load(context:blok.context.Context, props:$routeParams):tink.core.Promise<Dynamic>;
           #else
-            function loader(context:blok.context.Context, url:String) {
+            final function load(context:blok.context.Context, url:String) {
               var source = blok.gen2.source.CompiledDataSource.from(context);
               var path = blok.gen2.source.CompiledDataSource.getJsonDataPath(url);
               return switch source.preload(path) {
@@ -105,34 +89,24 @@ class RouteBuilder {
             }
           #end
 
-          public function new(props:{
-            #if blok.platform.static
-              load:$loadFun,
-            #end
-            decode:$decodeFun,
-            render:$renderFun,
-            ?provide:$provideFun
-          }) {
-            #if blok.platform.static
-              this.loader = props.load;
-            #end
-            this.provider = props.provide;
-            this.decoder = props.decode;
-            this.render = props.render;
-          }
+          public function new() {}
+
+          abstract function decode(context:blok.context.Context, data:Dynamic):T;
+
+          abstract function render(context:blok.context.Context, data:T):blok.ui.VNode;
 
           public function match(url:String):tink.core.Option<blok.gen2.routing.RouteResult> {
             if (matcher.match(url)) {
-              var load = (context:blok.context.Context) -> #if blok.platform.static
-                loader($a{loaderCallParams}).next(data -> {
+              var wrappedLoader = (context:blok.context.Context) -> #if blok.platform.static
+                load($a{loaderCallParams}).next(data -> {
                   var hooks = blok.gen2.core.HookService.from(context);
                   hooks.data.update(DataReady(url, data));
                   return tink.core.Promise.resolve(data);
                 });
               #else
-                loader(context, url);
+                load(context, url);
               #end
-              return Some(createResult(url, load, decoder, provider, render));
+              return Some(createResult(url, wrappedLoader, decode, render));
             }
 
             return None;
@@ -143,7 +117,7 @@ class RouteBuilder {
             access: [ APublic, AStatic ],
             kind: FFun({
               args: [
-                { name: 'props', type: TAnonymous(linkProps.concat([
+                { name: 'props', type: TAnonymous(routeFields.concat([
                   ({ 
                     name: 'className', 
                     kind: FVar(macro:String), 
@@ -161,35 +135,65 @@ class RouteBuilder {
             }),
             pos: (macro null).pos
           },
-    
+
           {
             name: 'toUrl',
             access: [ APublic, AStatic ],
             kind: FFun({
               args: [
-                { name: 'props', type: TAnonymous(linkProps) }
+                { name: 'props', type: routeParams }
               ],
               ret: macro:String,
               expr: macro return [ $a{urlBuilder} ].join('')
             }),
             pos: (macro null).pos
           }
-        ])
+        ]),
+        meta: [
+          {
+            name: ':autoBuild',
+            params: [ macro blok.gen2.routing.RouteBuilder.build() ],
+            pos: pos
+          }
+        ]
       });
     }
 
     return TPath({
       pack: pack,
       name: name,
-      params: [ TPType(ret.toComplexType()) ]
+      params: [ TPType(ret.toComplexType())  ]
     });
   }
 
-  static function typeExists(name:String) {
-    try {
-      return Context.getType(name) != null;
-    } catch (e:String) {
-      return false;
+  public static function build() {
+    var builder = ClassBuilder.fromContext();
+
+    if (Context.defined('blok.platform.dom') && builder.fieldExists('load')) {
+      // @todo: better warning
+      Context.warning(
+        'Make sure you wrap your load method with `#if blok.platform.static`. '
+        + 'In all other contexts, Blok will generate a load method and you will '
+        + 'encounter a compiler error.',
+        builder.getField('load').pos
+      );
     }
+
+    var superClass = builder.cls.superClass.t.get();
+    var scPath = superClass.pack.concat([ superClass.name ]);
+    
+    // note: At the moment, all this really does is forward the `link` and `toUrl`
+    //       methods to the final class.
+    builder.add(macro class {
+      public static inline function link(props, ...children:blok.ui.VNode) {
+        return $p{scPath}.link(props, ...children);
+      }
+
+      public static inline function toUrl(props) {
+        return $p{scPath}.toUrl(props);
+      }
+    });
+
+    return builder.export();
   }
 }

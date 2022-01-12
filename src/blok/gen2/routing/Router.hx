@@ -4,7 +4,7 @@ import blok.state.State;
 
 using tink.CoreApi;
 
-@service(fallback = throw 'No router found')
+@service(fallback = new Router({ route: None }))
 class Router implements State {
   @prop var route:Option<RouteResult>;
   @use var routes:RouteService;

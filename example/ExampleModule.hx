@@ -1,13 +1,10 @@
 import blok.context.ServiceProvider;
 import blok.gen2.core.Config;
-import blok.gen2.routing.Matchable;
 import blok.gen2.app.AppModule;
 import blok.gen2.content.ContentRenderer;
 import blok.gen2.routing.Scope;
+import blok.gen2.routing.Matchable;
 import example.data.BlogConfig;
-import example.ui.page.Post;
-import example.ui.page.PostArchive;
-import example.ui.page.Home;
 import example.ui.status.LoadingView;
 import example.ui.status.ErrorView;
 
@@ -25,8 +22,8 @@ using haxe.io.Path;
 using tink.CoreApi;
 
 class ExampleModule extends AppModule {
-	function provideConfig():Config {
-		return new Config({
+  function provideConfig():Config {
+    return new Config({
       site: new SiteConfig({
         url: 'http://localhost:5000',  
         title: 'Test',
@@ -48,9 +45,9 @@ class ExampleModule extends AppModule {
         })
       #end
     });
-	}
+  }
 
-	function provideRoutes():Array<Matchable> {
+  function provideRoutes():Array<Matchable> {
     return [
       new Scope<BlogConfig>({
         id: 'blog-data',
@@ -69,30 +66,19 @@ class ExampleModule extends AppModule {
           context.addService(data);
         },
         routes: [
-          example.route.HomeRoute.create((context, data) -> Home.node({
-            posts: data
-          })),
-          example.route.PostRoute.create((context, data) -> Post.node({
-            next: data.next,
-            prev: data.prev,
-            post: data.current
-          })),
-          example.route.PostArchiveRoute.create((context, data) -> PostArchive.node({
-            page: data.page,
-            totalPosts: data.totalPosts,
-            totalPages: data.totalPages,
-            posts: data.posts
-          }))
+          new example.route.HomeRoute(),
+          new example.route.PostRoute(),
+          new example.route.PostArchiveRoute()
         ]
       })
     ];
-	}
+  }
 
-	function provideServices():Array<ServiceProvider> {
+  function provideServices():Array<ServiceProvider> {
     return [
       ContentRenderer.withDefaults()
     ];
-	}
+  }
 
   #if blok.platform.static 
     function provideDataSources():Array<ServiceProvider> {
