@@ -5,6 +5,7 @@
 -lib blok.core.foundation
 
 -D debug
+# -D blok.gen.debug.no-logging
 -D js-es=6
 -D analyzer-optimize
 

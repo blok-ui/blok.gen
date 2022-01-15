@@ -11,6 +11,8 @@ import blok.gen2.core.Kernel;
 import blok.gen2.build.Visitor;
 import blok.gen2.build.FileWriter;
 import blok.gen2.build.MetadataService;
+import blok.gen2.cli.Display;
+import blok.gen2.cli.NodeConsole;
 
 using tink.CoreApi;
 
@@ -23,12 +25,12 @@ class StaticKernel extends Kernel {
   public function run() {
     // hooks.status.update(Generating);
 
-    var visitor = new Visitor(this);
+    var display = new Display(new NodeConsole());
+    var visitor = new Visitor(this, display);
     var writer = new FileWriter(config.ssr.destination);
 
-    Sys.println('');
-    Sys.println('Starting to build "${config.site.title}":');
-    Sys.println('');
+    display.write('Building [ ${config.site.title} ]');
+    display.work();
 
     visitor.visit('/');
     visitor.run().handle(o -> switch o {
@@ -38,17 +40,14 @@ class StaticKernel extends Kernel {
         })).handle(o -> switch o {
           case Success(_):
             // hooks.status.update(Complete(config));
-            Sys.println('');
-            Sys.println('Build completed with no errors.');
+            display.success('Build completed with no errors.');
             Sys.exit(0);
           case Failure(failure):
-            Sys.println('');
-            Sys.println('Build failed with: ${failure.message}');
+            display.error('Build failed with: ${failure.message}');
             Sys.exit(1);
         });
       case Failure(failure):
-        Sys.println('');
-        Sys.println('Build failed with: ${failure.message}');
+        display.error('Build failed with: ${failure.message}');
         Sys.exit(1);
     });
   }

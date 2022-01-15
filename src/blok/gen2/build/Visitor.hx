@@ -10,6 +10,7 @@ import blok.gen2.core.Kernel;
 import blok.gen2.core.HookService;
 import blok.gen2.source.CompiledDataSource;
 import blok.gen2.routing.HistoryService;
+import blok.gen2.cli.Display;
 
 using Lambda;
 using tink.CoreApi;
@@ -25,12 +26,14 @@ typedef VisitorResult = {
 class Visitor implements Service {
   final visited:Array<String> = [];
   final kernel:Kernel;
+  final display:Display;
   final exportedData:Array<String> = [];
   var root:Null<ConcreteWidget>;
   var pending:Array<String> = [];
 
-  public function new(kernel) {
+  public function new(kernel, display) {
     this.kernel = kernel;
+    this.display = display;
   }
   
   public function visit(url:String) {
@@ -68,8 +71,6 @@ class Visitor implements Service {
 
     var name = url == '' || url == '/' ? 'index' : url;
     
-    Sys.println(' □ Visiting [ ${name} ]');
-
     return new Promise((res:(data:Array<VisitorResult>)->Void, rej) -> {
       var context = kernel.createContext();
       var history = HistoryService.from(context);
@@ -98,26 +99,26 @@ class Visitor implements Service {
       var dataLink = hooks.data.observe(status -> switch status {
         case NoData: 
         case DataReady(matched, data) if (matched == url):
-          Sys.println(' ◧ Local data for [ $matched ] received');
+          display.setStatus('Local data for "$matched" received');
           addToBootstrap(matched, data);
           for (field in data.fields()) {
             dataResults.set(field, data.field(field));
           }
         case DataReady(matched, data):
-          Sys.println(' ◧ Outside data for [ $matched ] received (boot only)');
+          display.setStatus('Outside data for "$matched" received (boot only)');
           addToBootstrap(matched, data);
         case DataExport(matched, data):
           addToBootstrap(matched, data);
           var path = generateJsonPath(matched);
           if (!exportedData.contains(path)) {
             exportedData.push(path);
-            Sys.println(' ◧ Parent data for [ $matched ] received (exporting)');
+            display.setStatus('Parent data for "$matched" received (exporting)');
             exports.push({
               path: path,
               contents: Json.stringify(data)
             });
           } else {
-            Sys.println(' ◧ Parent data for [ $matched ] received (already exported, added to boot)');
+            display.setStatus('Parent data for "$matched" received (already exported, added to boot)');
           }
       });
 
@@ -129,10 +130,9 @@ class Visitor implements Service {
 
       hooks.page.handle(status -> switch status {
         case PageReady(matched, value) if (matched == url):
-          // var data = haxe.Json.stringify(value #if debug , '  ' #end);
           var bootData = haxe.Json.stringify(bootstrapResults #if debug , '  ' #end);
           var data = haxe.Json.stringify(dataResults #if debug , '  ' #end);
-          Sys.println(' ■ [ $name ] completed');
+          display.setStatus('Route "$name" complete');
           res([
             process(url, config, metadata, bootData, cast root.toConcrete()),
             ({
@@ -143,17 +143,14 @@ class Visitor implements Service {
           dataLink.dispose();
           Handled;
         case PageReady(matched, _):
-          Sys.println(' ? [ $matched ] hit instead of expected [ ${url} ]');
           dataLink.dispose();
-          rej(new Error(500, 'Invalid route reached'));
+          rej(new Error(500, 'Invalid route reached: "$matched" hit instead of expected "$url"'));
           Handled;
         case PageFailed(_, error):
-          Sys.println(' X [ $name ] failed with ${error.message}');
           dataLink.dispose();
           rej(error);
           Handled;
         default:
-          Sys.println(' ◧ [ $name ] processing...');
           Pending;
       });
 

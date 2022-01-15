@@ -100,7 +100,6 @@ class ImageDataSource implements Service {
         src.copy(dest);
         info;
       case Medium:
-        trace(info.width);
         Image.resize(
           src,
           dest,

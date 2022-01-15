@@ -2,6 +2,7 @@ package blok.gen.ssr;
 
 import blok.gen.datasource.CompiledDataSource;
 import blok.ssr.Platform;
+import blok.gen.cli.Display;
 
 using Lambda;
 using tink.CoreApi;
@@ -16,12 +17,14 @@ typedef VisitorResult = {
 class Visitor implements Service {
   final visited:Array<String> = [];
   final kernal:Kernal;
+  final display:Display;
   final results:Map<String, PageResult> = [];
   var root:Null<ConcreteWidget>;
   var pending:Array<String> = [];
 
-  public function new(kernal) {
+  public function new(kernal, display) {
     this.kernal = kernal;
+    this.display = display;
   }
   
   public function visit(url:String) {
@@ -62,8 +65,6 @@ class Visitor implements Service {
     visited.push(url);
 
     var name = url == '' || url == '/' ? 'index' : url;
-    
-    Sys.println(' □ Visiting: ${name}');
 
     return new Promise((res, rej) -> {
       var context = kernal.createRouteContext();
@@ -84,7 +85,7 @@ class Visitor implements Service {
       hooks.page.handle(status -> switch status {
         case PageReady(matched, value, _) if (matched == url):
           var data = haxe.Json.stringify(value #if debug , '  ' #end);
-          Sys.println(' ■ Completed: $name');
+          display.setStatus('Completed: $name');
           res([
             process(url, config, metadata, data, cast root.toConcrete()),
             ({
@@ -94,13 +95,11 @@ class Visitor implements Service {
           ]);
           Handled;
         case PageReady(matched, _, _):
-          Sys.println(' ? Hit $matched');
           Pending;
         case PageFailed(url, error, page):
-          Sys.println(' X Page $name failed with ${error.message}');
+          rej(error);
           Handled;
         default:
-          Sys.println(' ◧ Waiting on data for $name');
           Pending;
       });
 
