@@ -1,5 +1,6 @@
 package blok.gen2.formatter;
 
+import blok.context.Context;
 import blok.gen2.source.FileResult;
 
 using Markdown;
@@ -20,7 +21,7 @@ class MarkdownFormatter<T> implements Formatter<MarkdownResult<T>> {
     this.formatter = if (formatter == null) new TomlFormatter() else formatter;
   }
 
-  public function parse(file:FileResult):Promise<MarkdownResult<T>> {
+  public function parse(context:Context, file:FileResult):Promise<MarkdownResult<T>> {
     var data = file.content;
     if (data.startsWith(sep)) {
       var raw = data.substr(sep.length);
@@ -32,7 +33,7 @@ class MarkdownFormatter<T> implements Formatter<MarkdownResult<T>> {
       else
         content;
       
-      return formatter.parse({
+      return formatter.parse(context, {
         meta: file.meta,
         content: matter
       }).next(data -> {

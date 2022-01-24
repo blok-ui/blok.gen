@@ -1,5 +1,6 @@
 package blok.gen2.source;
 
+import blok.context.Context;
 import blok.context.Service;
 import blok.gen2.formatter.FormatterCollection;
 import blok.gen2.formatter.MarkdownFormatter;
@@ -13,6 +14,7 @@ using tink.CoreApi;
 ]))
 class FormattedDataSource implements Service {
   @use var source:FileDataSource;
+  @use var context:Context;
   final formatters:FormatterCollection;
 
   public function new(formatters) {
@@ -40,7 +42,7 @@ class FormattedDataSource implements Service {
       case null: Promise.reject(new Error(404, 'No formatter exists for the extension ${file.meta.extension}'));
       case formatter:
         formatter
-          .parse(file)
+          .parse(context, file)
           .next(data -> Promise.resolve({
             meta: file.meta,
             content: file.content,

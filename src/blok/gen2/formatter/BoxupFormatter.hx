@@ -8,6 +8,7 @@ import boxup.schema.Schema;
 import boxup.schema.SchemaId;
 import boxup.schema.SchemaCompiler;
 import boxup.schema.SchemaCollection;
+import blok.context.Context;
 import blok.gen2.source.FileDataSource;
 import blok.gen2.source.FileResult;
 
@@ -17,15 +18,13 @@ using boxup.schema.SchemaTools;
 
 class BoxupFormatter<T> implements Formatter<T> {
   final config:BoxupFormatterConfig<T>;
-  final schemaSource:FileDataSource;
   final schemaCollection:SchemaCollection = new SchemaCollection();
 
-  public function new(config, schemaSource) {
+  public function new(config) {
     this.config = config;
-    this.schemaSource = schemaSource;
   }
 
-  public function parse(file:FileResult):Promise<T> {
+  public function parse(context:Context, file:FileResult):Promise<T> {
     return new Promise((res, rej) -> {
       var source:Source = {
         content: file.content,
@@ -39,7 +38,7 @@ class BoxupFormatter<T> implements Formatter<T> {
           nodes
             .findSchema()
             .handleValue(id -> {
-              maybeLoadSchema(id).handle(o -> switch o {
+              maybeLoadSchema(context, id).handle(o -> switch o {
                 case Success(schema): 
                   compile(schema, nodes)
                     .handleValue(res)
@@ -69,10 +68,10 @@ class BoxupFormatter<T> implements Formatter<T> {
       .map(generator.generate);
   }
 
-  function maybeLoadSchema(id:SchemaId):Promise<Schema> {
+  function maybeLoadSchema(context:Context, id:SchemaId):Promise<Schema> {
     var schema = schemaCollection.get(id);
     if (schema != null) return Promise.resolve(schema);
-    return schemaSource.get(
+    return FileDataSource.from(context).get(
       Path.join([ config.schemaPath, id.toString() ]).withExtension('box')
     ).next(file -> {
       var compiler = new SchemaCompiler(config.reporter);

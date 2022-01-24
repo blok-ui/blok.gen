@@ -1,5 +1,6 @@
 package blok.gen2.formatter;
 
+import blok.context.Context;
 import blok.gen2.source.FileResult;
 import toml.TomlError;
 
@@ -8,7 +9,7 @@ using tink.CoreApi;
 class TomlFormatter<T> implements Formatter<T> {
   public function new() {}
 
-  public function parse(file:FileResult):Promise<T> {
+  public function parse(context:Context, file:FileResult):Promise<T> {
     return new Promise((res, rej) -> {
       try {
         res(Toml.parse(file.content));

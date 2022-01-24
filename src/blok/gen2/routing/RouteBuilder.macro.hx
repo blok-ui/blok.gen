@@ -41,13 +41,13 @@ class RouteBuilder {
         default: { name: entry.key, kind: FVar(macro:String), pos: pos };
       } ];
       var routeParams:ComplexType = TAnonymous(routeFields);
-      var loaderCallParams:Array<Expr> = [ macro context, {
+      var loaderCallParams:Expr = {
         expr: EObjectDecl([ for (i in 0...routeFields.length) {
           field: routeFields[i].name,
           expr: macro cast matcher.matched($v{i + 1})
         }  ]),
         pos: pos
-      } ];
+      };
       var pos = Context.currentPos();
       var urlBuilder:Array<Expr> = [ macro $v{builder[0]} ];
 
@@ -97,14 +97,15 @@ class RouteBuilder {
 
           public function match(url:String):tink.core.Option<blok.gen2.routing.RouteResult> {
             if (matcher.match(url)) {
-              var wrappedLoader = (context:blok.context.Context) -> #if blok.platform.static
-                load($a{loaderCallParams}).next(data -> {
+              #if blok.platform.static
+                var params = ${loaderCallParams};
+                var wrappedLoader = (context:blok.context.Context) -> load(context, params).next(data -> {
                   var hooks = blok.gen2.core.HookService.from(context);
                   hooks.data.update(DataReady(url, data));
                   return tink.core.Promise.resolve(data);
                 });
               #else
-                load(context, url);
+                var wrappedLoader = (context:blok.context.Context) -> load(context, url);
               #end
               return Some(createResult(url, wrappedLoader, decode, render));
             }

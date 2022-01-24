@@ -125,7 +125,10 @@ class Visitor implements Service {
       var root = Platform.render(
         kernel.bootstrap(context), 
         html -> null, 
-        e -> rej(new Error(500, e.toString()))
+        e -> {
+          dataLink.dispose();
+          rej(new Error(500, e.toString()));
+        }
       );
 
       hooks.page.handle(status -> switch status {
