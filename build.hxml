@@ -30,5 +30,5 @@
 
 -main Ssr
 
--js dist/build.js
--cmd node dist/build
+-js generate/index.js
+-cmd node generate

@@ -1,3 +1,0 @@
-# @install: lix --silent download "gh://github.com/wartman/capsule#0b63f95d21ce3fd52b7f55baddb8533a0e1deafc" into capsule/0.2.6/github/0b63f95d21ce3fd52b7f55baddb8533a0e1deafc
--cp ${HAXE_LIBCACHE}/capsule/0.2.6/github/0b63f95d21ce3fd52b7f55baddb8533a0e1deafc/src
--D capsule=0.2.6
