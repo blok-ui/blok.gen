@@ -1,7 +1,7 @@
 package example.route;
 
 import blok.context.Context;
-import blok.gen2.routing.Route;
+import blok.gen.routing.Route;
 import example.data.BlogPost;
 import example.data.BlogConfig;
 import example.ui.elements.Container;
@@ -37,7 +37,7 @@ class HomeRoute extends Route<'/', Array<BlogPost>> {
           Container.row(
             Container.column({ span: 6 },
               Html.p({},
-                Html.text('This is an example of how `blok.gen2` might work!')  
+                Html.text('This is an example of how `blok.gen` might work!')  
               )
             ),
             Container.column({ span: 3 },

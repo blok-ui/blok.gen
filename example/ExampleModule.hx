@@ -1,18 +1,18 @@
 import blok.context.ServiceProvider;
-import blok.gen2.core.Config;
-import blok.gen2.app.AppModule;
-import blok.gen2.content.ContentRenderer;
-import blok.gen2.routing.Scope;
-import blok.gen2.routing.Matchable;
+import blok.gen.core.Config;
+import blok.gen.app.AppModule;
+import blok.gen.content.ContentRenderer;
+import blok.gen.routing.Scope;
+import blok.gen.routing.Matchable;
 import example.data.BlogConfig;
 import example.ui.status.LoadingView;
 import example.ui.status.ErrorView;
 
 #if blok.platform.static
-  import blok.gen2.source.FileDataSource;
-  import blok.gen2.source.FormattedDataSource;
-  import blok.gen2.formatter.TomlFormatter;
-  import blok.gen2.formatter.MarkdownFormatter;
+  import blok.gen.source.FileDataSource;
+  import blok.gen.source.FormattedDataSource;
+  import blok.gen.formatter.TomlFormatter;
+  import blok.gen.formatter.MarkdownFormatter;
   import example.datasource.BlogPostDataSource;
 #end
 

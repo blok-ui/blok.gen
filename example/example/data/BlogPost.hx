@@ -1,7 +1,7 @@
 package example.data;
 
-import blok.gen2.data.Id;
-import blok.gen2.content.Content;
+import blok.gen.data.Id;
+import blok.gen.content.Content;
 
 using Blok;
 using Reflect;

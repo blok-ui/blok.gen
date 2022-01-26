@@ -1,6 +1,6 @@
 package example.ui.elements;
 
-import blok.gen2.core.Config;
+import blok.gen.core.Config;
 import example.route.HomeRoute;
 
 using Blok;

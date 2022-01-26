@@ -1,4 +1,4 @@
-import blok.gen2.app.ClientKernel;
+import blok.gen.app.ClientKernel;
 
 function main() {
   var kernal = new ClientKernel(new ExampleModule());

@@ -1,8 +1,8 @@
 package example.ui.layout;
 
-import blok.gen2.core.Config;
-import blok.gen2.core.HookService;
-import blok.gen2.ui.Head;
+import blok.gen.core.Config;
+import blok.gen.core.HookService;
+import blok.gen.ui.Head;
 import example.data.BlogConfig;
 import example.ui.elements.Container;
 import example.ui.elements.Navbar;

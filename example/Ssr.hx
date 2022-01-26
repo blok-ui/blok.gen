@@ -1,4 +1,4 @@
-import blok.gen2.app.StaticKernel;
+import blok.gen.app.StaticKernel;
 
 function main() {
   var kernal = new StaticKernel(new ExampleModule());

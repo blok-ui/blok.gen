@@ -1,7 +1,7 @@
 package example.route;
 
 import blok.data.Record;
-import blok.gen2.routing.Route;
+import blok.gen.routing.Route;
 import example.data.BlogPost;
 import example.data.BlogConfig;
 import example.ui.layout.DefaultLayout;
@@ -14,7 +14,7 @@ import example.ui.elements.Container;
 
 using Blok;
 using Reflect;
-using blok.gen2.data.PaginationTools;
+using blok.gen.data.PaginationTools;
 
 class PostArchiveWithPagination implements Record {
   @prop var page:Int;

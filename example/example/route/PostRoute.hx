@@ -1,8 +1,8 @@
 package example.route;
 
 import blok.context.Context;
-import blok.gen2.content.ContentRenderer;
-import blok.gen2.routing.Route;
+import blok.gen.content.ContentRenderer;
+import blok.gen.routing.Route;
 import example.data.BlogPost;
 import example.ui.elements.Container;
 import example.ui.layout.DefaultLayout;

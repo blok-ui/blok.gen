@@ -1,10 +1,10 @@
 package example.datasource;
 
 import blok.context.Service;
-import blok.gen2.data.Id;
-import blok.gen2.content.ContentGenerator;
-import blok.gen2.source.FormattedFileResult;
-import blok.gen2.source.FormattedDataSource;
+import blok.gen.data.Id;
+import blok.gen.content.ContentGenerator;
+import blok.gen.source.FormattedFileResult;
+import blok.gen.source.FormattedDataSource;
 import example.data.BlogPost;
 
 using Reflect;
