@@ -1,0 +1,20 @@
+{
+  "classPath": "src",
+  "name": "blok.gen",
+  "contributors": ["wartman"],
+  "license": "MIT",
+  "version": "0.0.1",
+  "releasenote": "Initial release",
+  "dependencies": {
+    "blok.platform.dom": "0.6.0-alpha.1",
+    "blok.platform.static": "0.6.0-alpha.1",
+    "blok.core.foundation": "0.5.0-alpha.1",
+    "boxup": "0.0.1-alpha.1",
+    "hxnodejs": "12.1.0",
+    "image": "0.2.0",
+    "markdown": "1.1.1",
+    "nuke": "0.0.0",
+    "toml": "0.0.1",
+    "tink_core": "2.0.2"
+  }
+}
