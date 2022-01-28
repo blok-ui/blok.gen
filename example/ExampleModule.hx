@@ -41,7 +41,7 @@ class ExampleModule extends AppModule {
       #if blok.platform.static
         ssr: new SsrConfig({
           source: Path.join([ Sys.programPath().directory().directory(), 'example/data' ]),
-          destination: Path.join([ Sys.programPath().directory(), 'www' ])
+          destination: Path.join([ Sys.programPath().directory().directory(), 'dist/www' ])
         })
       #end
     });

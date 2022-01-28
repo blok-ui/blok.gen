@@ -1,6 +1,8 @@
 -cp src
 -cp example
 
+-main Run
+
 -lib tink_core
 -lib blok.core.foundation
 
@@ -15,8 +17,6 @@
 
 -lib blok.platform.dom
 
--main Client
-
 -js dist/www/assets/app.js
 
 --next
@@ -27,8 +27,6 @@
 -lib markdown
 -lib boxup
 -lib blok.platform.static
-
--main Ssr
 
 -js generate/index.js
 -cmd node generate

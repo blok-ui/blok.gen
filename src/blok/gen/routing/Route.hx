@@ -1,5 +1,6 @@
 package blok.gen.routing;
 
+import Blok.ObservableResult;
 import blok.context.Context;
 import blok.context.Provider;
 import blok.ui.VNode;
@@ -21,8 +22,9 @@ abstract class RouteBase<T> implements Matchable {
     decode:(context:Context, data:Dynamic)->T,
     render:(context:Context, data:T)->VNode
   ):RouteResult {
+    var data:ObservableResult<T, Error> = null;
     return (context:Context) -> {
-      var data = load(context).toObservableResult();
+      if (data == null) data = load(context).toObservableResult();
       var config = Config.from(context);
       var hooks = HookService.from(context);
 

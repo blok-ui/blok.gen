@@ -10,8 +10,6 @@ using DateTools;
   which ensures that data never gets out of sync. Each CacheItem has its own 
   lifetime, meaning that the cache is only cleared when the most stale item 
   is hit.
-
-  Note: if you set `lifetime` to 0 you'll probably break your app.
 **/
 class TimedCache<T> implements Cache<T> {
   public inline static final ONE_MINUTE = 60000;
