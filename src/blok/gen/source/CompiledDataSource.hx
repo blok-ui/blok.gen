@@ -5,6 +5,7 @@ import js.Browser.document;
 import blok.context.Service;
 import blok.gen.core.HookService;
 import blok.gen.cache.CacheService;
+import blok.gen.cache.PersistantCache;
 
 using StringTools;
 using Reflect;
@@ -22,23 +23,40 @@ class CompiledDataSource implements Service {
   @use var http:HttpDataSource;
   @use var hooks:HookService;
   @use var cache:CacheService;
+
+  var isHydrating:Bool = false;
+  var hydrationCache:PersistantCache<Dynamic> = new PersistantCache();
   
   public function new() {}
 
   @init
   function preloadData() {
-    if (window.hasField(dataProperty)) {
-      var data:Dynamic = window.field(dataProperty);
-      for (path in data.fields()) {
-        cache.getCache().set(path, data.field(path));
-      }
-      window.deleteField(dataProperty);
-      document.getElementById(dataProperty).remove();
-    }
+    hooks.site.handle(status -> switch status {
+      case NoSite: 
+        Pending;
+      case SiteHydrating:
+        isHydrating = true;
+        if (window.hasField(dataProperty)) {
+          var data:Dynamic = window.field(dataProperty);
+          for (path in data.fields()) {
+            hydrationCache.set(path, data.field(path));
+          }
+          window.deleteField(dataProperty);
+          document.getElementById(dataProperty).remove();
+        }
+        Pending;
+      case SiteReady:
+        isHydrating = false;
+        for (path in hydrationCache.getKeys()) {
+          cache.getCache().set(path, hydrationCache.get(path));
+        }
+        hydrationCache = null;
+        Handled;
+    });
   }
 
   public function preload<T>(path:String):Option<T> {
-    var c = cache.getCache();
+    var c = isHydrating ? hydrationCache : cache.getCache();
 
     path = normalize(path);
 

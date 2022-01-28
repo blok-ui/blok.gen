@@ -28,4 +28,8 @@ class PersistantCache<T> implements Cache<T> {
   public function clear() {
     data.clear();
   }
+
+  public function getKeys() {
+    return data.keys();
+  }
 }
