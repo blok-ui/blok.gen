@@ -4,6 +4,8 @@ import blok.gen.core.HookService;
 import blok.state.State;
 
 using tink.CoreApi;
+using haxe.io.Path;
+using StringTools;
 
 @service(fallback = new Router({ route: None }))
 class Router implements State {
@@ -40,6 +42,15 @@ class Router implements State {
   @update
   public function match(url:String) {
     if (locked) return null;
-    return { route: routes.match(url) };
+    return { route: routes.match(prepareUrl(url)) };
+  }
+
+  // @todo: I'm not sure if this is the best place for this.
+  function prepareUrl(url:String) {
+    if (url == '/') return url;
+    if (url.endsWith('index.html')) {
+      url = url.replace('index.html', '');
+    }
+    return url.normalize().removeTrailingSlashes();
   }
 }

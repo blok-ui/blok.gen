@@ -34,6 +34,7 @@ class StaticKernel extends Kernel {
   }
 
   public function run() {
+    // @todo: Don't lock us in to using NodeConsole
     var display = new Display(new NodeConsole());
     var visitor = new Visitor(this, display);
     var writer = new FileWriter(config.ssr.destination);

@@ -32,10 +32,6 @@ class RouteBuilder {
     var name = 'Route_${suffix}';
 
     if (!pack.concat([ name ]).join('.').typeExists()) {
-      // var types:Array<ComplexType> = [ for (entry in params) switch entry.type {
-      //   case 'Int': macro:Int;
-      //   default: macro:String;
-      // } ];
       var routeFields:Array<Field> = [ for (entry in params) switch entry.type {
         case 'Int': { name: entry.key, kind: FVar(macro:Int), pos: pos };
         default: { name: entry.key, kind: FVar(macro:String), pos: pos };
