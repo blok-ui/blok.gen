@@ -71,7 +71,7 @@ class Visitor implements Service {
 
     var name = url == '' || url == '/' ? 'index' : url;
     
-    return new Promise((res:(data:Array<VisitorResult>)->Void, rej) -> {
+    return new Promise((res:(data:Array<VisitorResult>)->Void, reject) -> {
       var context = kernel.createContext();
       var history = HistoryService.from(context);
       var hooks = HookService.from(context);
@@ -80,6 +80,9 @@ class Visitor implements Service {
       var bootstrapResults:DynamicAccess<Dynamic> = {};
       var dataResults:DynamicAccess<Dynamic> = {};
       var exports:Array<VisitorResult> = [];
+      var rej = (e:Error) -> {
+        reject(new Error(e.code, e.message + ' (when rendering ${url})'));
+      }
 
       context.addService(this);
       history.setLocation(url);
