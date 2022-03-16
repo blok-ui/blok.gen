@@ -21,7 +21,7 @@ class PageLoader extends Component implements Hydratable {
   #if blok.platform.dom
     public function hydrate(
       firstNode:js.html.Node,
-      registerEffect:(effect:()->Void)->Void,
+      effects:blok.ui.Effect,
       next:()->Void
     ) {
       result.handle(result -> switch result {
@@ -33,7 +33,7 @@ class PageLoader extends Component implements Hydratable {
             __performRender().toArray(),
             getPlatform(),
             firstNode,
-            registerEffect,
+            effects,
             next
           );
           Handled;
